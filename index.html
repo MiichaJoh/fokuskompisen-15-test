@@ -1030,6 +1030,7 @@ async function loadAccount(session) {
   clearTimeout(syncTimer);
   syncReady = false;
   activeUserId = id || null;
+  refreshScheduleAccount15(id || null);
   if (!id) {
     state = safeState(null);
     drawAccountState();
@@ -1726,16 +1727,37 @@ $("routineAdd").addEventListener("click",()=>{
 let routineDate09=routineToday09();setInterval(()=>{if(routineDate09!==routineToday09()){routineDate09=routineToday09();renderRoutines09();}},60000);
 
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-const scheduleStorageKey = "fokuskompisen07schedule";
-let scheduleActivities;
-try { const old = JSON.parse(localStorage.getItem(scheduleStorageKey) || "[]"); scheduleActivities = Array.isArray(old) ? old.filter(x => typeof x === "string") : []; } catch { scheduleActivities = []; }
+// 1.5: Kontobunden lagring. Äldre globala testaktiviteter importeras inte automatiskt.
+const scheduleStoragePrefix15 = "fokuskompisen15schedule:account:";
+const iconStoragePrefix15 = "fokuskompisen15icons:account:";
+const doneStoragePrefix15 = "fokuskompisen15done:account:";
+let scheduleActivities = [];
 const scheduleButton = document.getElementById("addScheduleActivity");
 const visualIcons15 = ["🌅","🥣","🧹","📚","🚶","🛒","☕","💊","🛁","🌙","💜","🐕","🍽️","🪥","🚿","🛏️","☀️","🎒","🧸","🎮"];
-const iconKey15 = "fokuskompisen15icons";
-const doneKey15 = "fokuskompisen15done";
+let visualIconsSaved15 = {};
+let visualDone15 = {};
+let scheduleAccount15 = null;
 function readVisual15(key){try {const x=JSON.parse(localStorage.getItem(key)||"{}");return x&&typeof x==="object"&&!Array.isArray(x)?x:{};}catch{return {};}}
-let visualIconsSaved15=readVisual15(iconKey15);
-let visualDone15=readVisual15(doneKey15);
+function scheduleKey15(prefix){return scheduleAccount15 ? prefix+scheduleAccount15 : null;}
+function refreshScheduleAccount15(id){
+ const next=id||null;
+ if(scheduleAccount15===next)return;
+ scheduleAccount15=next;
+ scheduleActivities=[];visualIconsSaved15={};visualDone15={};
+ if(next){
+  try {const data=JSON.parse(localStorage.getItem(scheduleKey15(scheduleStoragePrefix15))||"[]");
+   scheduleActivities=Array.isArray(data)?data.filter(v=>typeof v==="string"):[];
+  }catch(_){scheduleActivities=[];}
+  visualIconsSaved15=readVisual15(scheduleKey15(iconStoragePrefix15));
+  visualDone15=readVisual15(scheduleKey15(doneStoragePrefix15));
+ }
+ renderVisualSchedule15();updateHomeSchedule();
+}
+function saveScheduleMetadata15(){
+ if(!scheduleAccount15)return;
+ localStorage.setItem(scheduleKey15(iconStoragePrefix15),JSON.stringify(visualIconsSaved15));
+ localStorage.setItem(scheduleKey15(doneStoragePrefix15),JSON.stringify(visualDone15));
+}
 function chooseVisualIcon15(onPick){
  const overlay=document.createElement("div");overlay.className="visual-picker15";
  const panel=document.createElement("div");panel.className="visual-picker-panel15";panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label","Välj symbol");
@@ -1748,26 +1770,28 @@ function chooseVisualIcon15(onPick){
  const cancel=document.createElement("button");cancel.type="button";cancel.className="visual-picker-cancel15";cancel.textContent="Avbryt";cancel.onclick=close;
  panel.append(heading,info,grid,cancel);overlay.appendChild(panel);document.body.appendChild(overlay);document.addEventListener("keydown",keyHandler);grid.querySelector("button").focus();
 }
-function saveSchedule15(){localStorage.setItem(scheduleStorageKey,JSON.stringify(scheduleActivities));updateHomeSchedule();}
+function saveSchedule15(){if(!scheduleAccount15)return;localStorage.setItem(scheduleKey15(scheduleStoragePrefix15),JSON.stringify(scheduleActivities));updateHomeSchedule();}
 function splitSchedule15(value){const match=value.match(/^([01]?\d|2[0-3]):[0-5]\d\s*[–-]\s*(.*)$/);return match?{time:match[0].slice(0,5),name:match[2]}:{time:"",name:value};}
 function renderVisualSchedule15(){
  const container=document.getElementById("scheduleActivities");container.replaceChildren();
+ if(!scheduleAccount15){container.textContent="Logga in för att se ditt personliga dagsschema.";return;}
  if(!scheduleActivities.length){const p=document.createElement("p");p.textContent="Inga aktiviteter ännu. Lägg till en när du vill.";container.appendChild(p);return;}
  const order=scheduleActivities.map((value,index)=>({value,index,...splitSchedule15(value)}));
  order.sort((a,b)=>a.time&&b.time?a.time.localeCompare(b.time):a.time?-1:b.time?1:a.index-b.index);
  order.forEach(({value,index,time,name})=>{
   const card=document.createElement("div");card.className="visual-card15";
   const icon=document.createElement("button");icon.type="button";icon.className="visual-icon15";icon.textContent=visualIconsSaved15[value]||"🌷";icon.setAttribute("aria-label","Byt symbol för "+name);
-  icon.onclick=()=>chooseVisualIcon15(choice=>{visualIconsSaved15[value]=choice;localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));renderVisualSchedule15();});
+  icon.onclick=()=>chooseVisualIcon15(choice=>{visualIconsSaved15[value]=choice;saveScheduleMetadata15();renderVisualSchedule15();});
   const label=document.createElement("div");label.className="visual-label15";const title=document.createElement("strong");title.textContent=(time?time+" – ":"")+name;label.appendChild(title);
-  const checked=document.createElement("input");checked.type="checkbox";checked.checked=!!visualDone15[value];checked.setAttribute("aria-label","Markera "+name+" som klar");checked.onchange=()=>{visualDone15[value]=checked.checked;localStorage.setItem(doneKey15,JSON.stringify(visualDone15));card.classList.toggle("visual-done15",checked.checked);};
+  const checked=document.createElement("input");checked.type="checkbox";checked.checked=!!visualDone15[value];checked.setAttribute("aria-label","Markera "+name+" som klar");checked.onchange=()=>{visualDone15[value]=checked.checked;saveScheduleMetadata15();card.classList.toggle("visual-done15",checked.checked);};
   const edit=document.createElement("button");edit.type="button";edit.textContent="✏️ Redigera";edit.onclick=()=>openScheduleForm15(index);
-  const del=document.createElement("button");del.type="button";del.textContent="🗑️ Ta bort";del.onclick=()=>{if(!confirm("Vill du ta bort aktiviteten?"))return;scheduleActivities.splice(index,1);delete visualDone15[value];delete visualIconsSaved15[value];localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));localStorage.setItem(doneKey15,JSON.stringify(visualDone15));saveSchedule15();renderVisualSchedule15();};
+  const del=document.createElement("button");del.type="button";del.textContent="🗑️ Ta bort";del.onclick=()=>{if(!confirm("Vill du ta bort aktiviteten?"))return;scheduleActivities.splice(index,1);delete visualDone15[value];delete visualIconsSaved15[value];saveScheduleMetadata15();saveScheduleMetadata15();saveSchedule15();renderVisualSchedule15();};
   const actions=document.createElement("div");actions.className="visual-actions15";actions.append(edit,del);
   card.append(icon,label,checked,actions);card.classList.toggle("visual-done15",checked.checked);container.appendChild(card);
  });
 }
 function openScheduleForm15(editIndex=null){
+ if(!scheduleAccount15){alert("Logga in för att ändra dagsschemat.");return;}
  const existing=editIndex===null?null:scheduleActivities[editIndex];
  const parts=existing?splitSchedule15(existing):{name:"",time:""};
  let selected=existing?(visualIconsSaved15[existing]||"🌷"):"🌅";
@@ -1800,7 +1824,7 @@ function openScheduleForm15(editIndex=null){
   if(existing!==null){scheduleActivities[editIndex]=value;if(value!==existing){visualDone15[value]=!!visualDone15[existing];delete visualDone15[existing];delete visualIconsSaved15[existing];}}
   else{scheduleActivities.push(value);}
   visualIconsSaved15[value]=selected;
-  localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));localStorage.setItem(doneKey15,JSON.stringify(visualDone15));saveSchedule15();renderVisualSchedule15();close();
+  saveScheduleMetadata15();saveScheduleMetadata15();saveSchedule15();renderVisualSchedule15();close();
  });
 }
 scheduleButton.addEventListener("click",()=>openScheduleForm15());
@@ -1811,6 +1835,7 @@ function updateHomeSchedule() {
       if (!container) return;
   container.replaceChildren();
 
+  if (!scheduleAccount15) { container.textContent = "Logga in för att se ditt dagsschema."; return; }
   if (scheduleActivities.length === 0) {
     container.textContent = "Inga aktiviteter i schemat ännu.";
     return;
@@ -1956,6 +1981,7 @@ let authReady = false;
 
 function displayAuthState(session) {
   authReady = true;
+  refreshScheduleAccount15(session?.user?.id || null);
   const loggedIn = Boolean(session && session.user);
   const showApp = loggedIn && !passwordRecoveryActive;
   loginSection.hidden = showApp;
@@ -2081,9 +2107,11 @@ deleteAccountButton.addEventListener("click", async () => {
     accountGeneration++;
     syncReady = false;
     activeUserId = null;
+    refreshScheduleAccount15(null);
     try {
       localStorage.removeItem(accountKey(user.id));
       localStorage.removeItem(pendingKey(user.id));
+      for(const prefix of [scheduleStoragePrefix15,iconStoragePrefix15,doneStoragePrefix15])localStorage.removeItem(prefix+user.id);
       const prefixes = ["fokuskompisen09-routine-draft:" + user.id + ":"];
       const exactKeys = ["fokuskompisen09-kickoff:" + user.id,
         "fokuskompisen10-welcome:" + user.id];
