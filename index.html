@@ -470,6 +470,17 @@ footer{padding:26px 16px 36px;font-size:.9rem}
 .visual-picker-grid15 button{font-size:29px;min-height:62px;background:#51416f;border:2px solid #8d72b3;border-radius:12px;cursor:pointer}
 .visual-picker-grid15 button:focus-visible,.visual-picker-grid15 button:hover{outline:3px solid #e0c7ff;background:#72579b}
 .visual-picker-cancel15{padding:10px 18px;border-radius:10px;background:#66517e;color:#fff}
+
+/* Samlad aktivitetsruta 1.5 */
+.visual-form15{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:14px}
+.visual-form15[hidden]{display:none!important}
+.visual-form-panel15{box-sizing:border-box;background:#302b42;color:#fff;border:2px solid #b59be1;border-radius:18px;padding:20px;width:min(100%,480px);max-height:92vh;overflow-y:auto;box-shadow:0 15px 40px #0008}
+.visual-form-panel15 label{display:block;margin:14px 0 5px;font-weight:650}
+.visual-form-panel15 input[type=text],.visual-form-panel15 input[type=time]{box-sizing:border-box;width:100%;min-height:48px;background:#fff;color:#171321;border:2px solid #b59be1;border-radius:10px;padding:10px;font:inherit}
+.visual-form-panel15 .visual-picker-grid15 button[aria-pressed=true]{outline:3px solid #fff;background:#7a59a5;border-color:#fff}
+.visual-form-actions15{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.visual-form-actions15 button{flex:1;min-height:48px;border-radius:10px;padding:10px;background:#7354a5;color:#fff;border:1px solid #b59be1}
+.visual-form-error15{color:#ffd8df;min-height:1.3em}
 </style>
 <style id="welcome-guide-style">
 #welcomeGuideOverlay[hidden]{display:none!important}
@@ -1750,18 +1761,49 @@ function renderVisualSchedule15(){
   icon.onclick=()=>chooseVisualIcon15(choice=>{visualIconsSaved15[value]=choice;localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));renderVisualSchedule15();});
   const label=document.createElement("div");label.className="visual-label15";const title=document.createElement("strong");title.textContent=(time?time+" – ":"")+name;label.appendChild(title);
   const checked=document.createElement("input");checked.type="checkbox";checked.checked=!!visualDone15[value];checked.setAttribute("aria-label","Markera "+name+" som klar");checked.onchange=()=>{visualDone15[value]=checked.checked;localStorage.setItem(doneKey15,JSON.stringify(visualDone15));card.classList.toggle("visual-done15",checked.checked);};
-  const edit=document.createElement("button");edit.type="button";edit.textContent="✏️ Redigera";edit.onclick=()=>{const next=prompt("Ändra tid och aktivitet (t.ex. 08:30 – Frukost):",value);if(next===null||!next.trim())return;const nv=next.trim();scheduleActivities[index]=nv;visualIconsSaved15[nv]=visualIconsSaved15[value]||"🌷";visualDone15[nv]=!!visualDone15[value];delete visualIconsSaved15[value];delete visualDone15[value];localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));localStorage.setItem(doneKey15,JSON.stringify(visualDone15));saveSchedule15();renderVisualSchedule15();};
+  const edit=document.createElement("button");edit.type="button";edit.textContent="✏️ Redigera";edit.onclick=()=>openScheduleForm15(index);
   const del=document.createElement("button");del.type="button";del.textContent="🗑️ Ta bort";del.onclick=()=>{if(!confirm("Vill du ta bort aktiviteten?"))return;scheduleActivities.splice(index,1);delete visualDone15[value];delete visualIconsSaved15[value];localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));localStorage.setItem(doneKey15,JSON.stringify(visualDone15));saveSchedule15();renderVisualSchedule15();};
   const actions=document.createElement("div");actions.className="visual-actions15";actions.append(edit,del);
   card.append(icon,label,checked,actions);card.classList.toggle("visual-done15",checked.checked);container.appendChild(card);
  });
 }
-scheduleButton.addEventListener("click",()=>{
- const name=prompt("Vad vill du lägga till i ditt dagsschema?");if(!name||!name.trim())return;
- const time=prompt("Vilken tid? Skriv t.ex. 08:30 (eller lämna tomt)");if(time===null)return;
- const trimmed=time.trim();if(trimmed&&!/^([01]?\d|2[0-3]):[0-5]\d$/.test(trimmed)){alert("Ange en tid som 08:30 eller lämna tomt.");return;}
- const value=(trimmed?trimmed+" – ":"")+name.trim();chooseVisualIcon15(choice=>{scheduleActivities.push(value);visualIconsSaved15[value]=choice;localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));saveSchedule15();renderVisualSchedule15();});
-});
+function openScheduleForm15(editIndex=null){
+ const existing=editIndex===null?null:scheduleActivities[editIndex];
+ const parts=existing?splitSchedule15(existing):{name:"",time:""};
+ let selected=existing?(visualIconsSaved15[existing]||"🌷"):"🌅";
+ const overlay=document.createElement("div");overlay.className="visual-form15";
+ const panel=document.createElement("div");panel.className="visual-form-panel15";panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-labelledby","scheduleFormTitle15");
+ const heading=document.createElement("h3");heading.id="scheduleFormTitle15";heading.textContent=existing?"✏️ Redigera aktivitet":"🌸 Lägg till aktivitet";
+ const form=document.createElement("form");form.noValidate=true;
+ const nameLabel=document.createElement("label");nameLabel.textContent="Aktivitet";nameLabel.htmlFor="scheduleName15";
+ const name=document.createElement("input");name.type="text";name.id="scheduleName15";name.required=true;name.maxLength=160;name.value=parts.name;
+ const timeLabel=document.createElement("label");timeLabel.textContent="Tid (valfritt)";timeLabel.htmlFor="scheduleTime15";
+ const time=document.createElement("input");time.type="time";time.id="scheduleTime15";time.value=parts.time;
+ const symbolLabel=document.createElement("label");symbolLabel.textContent="Välj symbol";
+ const grid=document.createElement("div");grid.className="visual-picker-grid15";grid.setAttribute("role","group");grid.setAttribute("aria-label","Välj symbol");
+ const symbols=[...new Set([selected,...visualIcons15])];
+ const symbolButtons=[];
+ const setSelected=(emoji)=>{selected=emoji;symbolButtons.forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.emoji===emoji)));};
+ symbols.forEach((emoji)=>{const b=document.createElement("button");b.type="button";b.textContent=emoji;b.dataset.emoji=emoji;b.setAttribute("aria-label","Välj symbol "+emoji);b.onclick=()=>setSelected(emoji);grid.appendChild(b);symbolButtons.push(b);});setSelected(selected);
+ const error=document.createElement("p");error.className="visual-form-error15";error.setAttribute("role","alert");
+ const actions=document.createElement("div");actions.className="visual-form-actions15";
+ const save=document.createElement("button");save.type="submit";save.textContent="💜 Spara aktivitet";
+ const cancel=document.createElement("button");cancel.type="button";cancel.textContent="Avbryt";
+ const previousFocus=document.activeElement;
+ const close=()=>{document.removeEventListener("keydown",onKey);overlay.remove();if(previousFocus&&previousFocus.isConnected)previousFocus.focus();};
+ const onKey=e=>{if(e.key==="Escape"){e.preventDefault();close();}else if(e.key==="Tab"){const items=[...panel.querySelectorAll('input,button')];const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}};
+ cancel.onclick=close;actions.append(save,cancel);
+ form.append(nameLabel,name,timeLabel,time,symbolLabel,grid,error,actions);panel.append(heading,form);overlay.appendChild(panel);document.body.appendChild(overlay);document.addEventListener("keydown",onKey);name.focus();
+ form.addEventListener("submit",e=>{
+  e.preventDefault();const n=name.value.trim();if(!n){error.textContent="Skriv aktivitetens namn.";name.focus();return;}
+  const t=time.value;const value=(t?t+" – ":"")+n;
+  if(existing!==null){scheduleActivities[editIndex]=value;if(value!==existing){visualDone15[value]=!!visualDone15[existing];delete visualDone15[existing];delete visualIconsSaved15[existing];}}
+  else{scheduleActivities.push(value);}
+  visualIconsSaved15[value]=selected;
+  localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));localStorage.setItem(doneKey15,JSON.stringify(visualDone15));saveSchedule15();renderVisualSchedule15();close();
+ });
+}
+scheduleButton.addEventListener("click",()=>openScheduleForm15());
 renderVisualSchedule15();
     // Visa sparade aktiviteter på den personliga startsidan
 function updateHomeSchedule() {
