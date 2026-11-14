@@ -1,0 +1,7 @@
+Fokuskompisen 1.1 – FOKUSLÄGE TEST
+
+Testa i separat GitHub-repo eller testgren. Ersätt inte fungerande 1.0 utan test.
+Nytt: menyval Fokusläge, välj befintlig uppgift, börja, paus, markera klar.
+Befintlig Supabase, lagringsnycklar, kontoradering och övriga sidor behållna.
+Kontrollera inloggning, sparade uppgifter, mobil, offline, paus, och att klar-status sparas efter omladdning.
+Obs: Integritetspolicyn i originalet är fortfarande markerad som ej färdig.

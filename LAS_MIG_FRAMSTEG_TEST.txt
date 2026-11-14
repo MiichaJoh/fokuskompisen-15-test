@@ -1,0 +1,12 @@
+Fokuskompisen 0.9 – Mina framsteg (test)
+
+Ny meny: Mina framsteg.
+Markera en vanlig uppgift som klar, öppna Mina framsteg och kontrollera Idag/veckan.
+Uppdatera sidan och kontrollera att framstegen finns kvar.
+Ångra klar och kontrollera att posten försvinner.
+Kontrollera offline och att ett annat konto inte visar samma uppgifter.
+
+Tidigare avklarade uppgifter utan tidsstämpel visas separat utan påhittat datum.
+Återkommande uppgifter som flyttas fram markeras inte som avklarade, precis som tidigare.
+Funktionen använder kontots befintliga lagring och säkerhetskopia.
+Ingen ändring på GitHub görs av denna ZIP.

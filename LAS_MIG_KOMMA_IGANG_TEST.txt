@@ -1,0 +1,48 @@
+FOKUSKOMPISEN 0.9 – HJÄLP MIG KOMMA IGÅNG – TEST
+Bygger på fokuskompisen-09-test-main (8).zip.
+
+NYTT
+Öppna Meny > Hjälp mig komma igång.
+Skriv en uppgift och välj Visa ett litet första steg.
+Nästa steg visar nästa förslag. Ta paus behåller aktuellt steg.
+Fortsätt med samma steg återupptar efter paus.
+Jag är klar avslutar hjälpen utan att ändra uppgifter eller rutiner.
+Du kan avsluta när du vill, även innan alla förslag har visats.
+Vanliga uppgifter får färdiga relevanta förslag. Okända uppgifter får
+allmänna förslag, tydligt märkta. Ingen AI eller API används för hjälpen.
+
+DATA
+Befintliga lagringsnycklar, kontosynkronisering och rutiner är oförändrade.
+Hjälpens text och läge lagras separat per konto i samma webbläsare.
+Hjälpens lokala utkast synkroniseras inte och ingår inte i JSON-exporten.
+Rensning av webbläsarens data tar bort den lokala hjälpen.
+Cacheversionen har höjts, utan att äldre cache raderas.
+Manifest och tidigare läsfil är oförändrade från originalet.
+
+INSTALLATION – EN SAK I TAGET
+1. Packa upp ZIP-filen. Behåll originalet.
+2. Innan en eventuell installation: exportera en säkerhetskopia i appen.
+3. Be om nästa installationssteg i chatten. Inget är publicerat.
+Kontodata på befintlig adress följer inte automatiskt med till en annan
+adress. Lokal öppning av index.html är inte ett fullständigt PWA-test.
+Offline kräver att appen först har laddats online och att den befintliga
+inloggningen och appens filer finns kvar på enheten. Ny inloggning kräver nät.
+
+TESTA PÅ DIN ENHET, ETT TEST I TAGET
+- Städa sovrummet: första steget ska gälla en sak där du städar.
+- Nästa steg: ett nytt steg visas, utan att rutin eller uppgift ändras.
+- Ta paus: paustext visas. Fortsätt med samma steg återställer samma steg.
+- Byt flik och uppdatera: uppgift, steg och pausläge ska finnas kvar.
+- Jag är klar: lugnt avslut, inga fler steg förrän du startar igen.
+- Testa Diska, Handla mat, Plugga svenska och en okänd uppgift.
+- Tomt eller bara blanksteg: ska inte starta hjälp.
+- Ladda online, gå sedan offline: öppna hjälpen, starta, pausa,
+  uppdatera och fortsätt. Testa befintliga rutiner och uppgifter också.
+- Kontrollera på mobil, i mörkt tema och med tangentbord/Tab.
+
+KONTROLLER HÄR
+JavaScript-syntax och isolerade logiktester godkända: förslag, nästa steg,
+paus, återställning, avslut, tom inmatning och kontoseparering.
+Befintlig JavaScript bevarad, förutom en ny post i sidnavigeringen.
+Fullständigt webbläsar-, inloggnings-, synk- och offline-test återstår:
+webbläsaren gick inte att starta i byggmiljön.

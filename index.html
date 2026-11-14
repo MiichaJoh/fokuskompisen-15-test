@@ -1,0 +1,2324 @@
+<!doctype html><html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fokuskompisen – 1.0 designtest</title><meta name="theme-color" content="#7853a3"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Fokuskompisen"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png"><style>
+*{box-sizing:border-box}body{font:16px/1.5 system-ui,sans-serif;background:#f4effa;color:#392d47;margin:0}header{text-align:center;padding:28px 12px}h1,h2{color:#68458e}h1{margin:0}main{max-width:850px;margin:auto;padding:0 12px}section{background:#fff;border-radius:18px;padding:20px;margin-bottom:15px;box-shadow:0 3px 15px #4e2e6410}label{display:block;margin:10px 0 5px;font-weight:600}input:not([type=checkbox]),textarea,select{width:100%;padding:10px;border:1px solid #d9c8e8;border-radius:9px;font:inherit}textarea{min-height:65px}button{background:#7856a2;color:white;border:0;border-radius:9px;padding:10px 13px;margin:5px 5px 5px 0;font:inherit;cursor:pointer}.alt{background:#eae1f4;color:#563879}.selected{background:#4c3070}.flex{display:flex;gap:12px;flex-wrap:wrap}.flex>*{flex:1;min-width:175px}.panel{background:#f7f3fc;border-radius:11px;padding:12px;margin:9px 0}.done{opacity:.6}.done strong{text-decoration:line-through}.week{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}.small{font-size:.9em;color:#695d73}#clock{text-align:center;font-size:2.3rem;color:#68458e;font-weight:700}footer{text-align:center;padding:20px;color:#695d73}
+
+.notice{border-left:4px solid #7954a2;background:#f6effd;padding:12px;border-radius:8px}
+.warning{border-left-color:#b35c42;background:#fff5ed}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=time]{width:100%}
+.task-row{border-bottom:1px solid #e5d9ed;padding:12px 0}
+.task-row:last-child{border-bottom:0}
+.task-row label{font-size:.92rem}
+#status{min-height:1.4em}
+@media(max-width:480px){button{min-height:43px}}
+#menuButton {
+    float: right;
+  background: #9270c3;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}#mainMenu {
+  background: #f3edfa;
+  border: 1px solid #d8c6eb;
+  border-radius: 16px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+#mainMenu[hidden] {
+  display: none;
+}#mainMenu button {
+  display: block;
+  width: 100%;
+  background: white;
+  color: #392d47;
+  border: 1px solid #e2d5ee;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+#mainMenu button:focus-visible {
+  outline: 3px solid #7954a2;
+  outline-offset: 2px;
+}main section[hidden] {
+  display: none !important;
+}
+/* Fokuskompisen 0.7 – färgteman */
+:root {
+  --theme-bg: #f7f2fc;
+  --theme-text: #30263b;
+  --theme-accent: #9270c3;
+}
+    /* Mjuk blå */
+body[data-theme="blue"] {
+  --theme-bg: #eaf4fc;
+  --theme-text: #243b53;
+  --theme-accent: #528bb8;
+}
+    /* Naturgrön */
+body[data-theme="green"] {
+  --theme-bg: #eaf5e8;
+  --theme-text: #29452e;
+  --theme-accent: #5b9565;
+}
+    /* Mörkt läge */
+body[data-theme="dark"] {
+  --theme-bg: #242331;
+  --theme-text: #f1edf8;
+  --theme-accent: #a78bda;
+}
+    /* Använd det valda färgtemat */
+body {
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
+}
+    /* Anpassa menyknappen efter färgtemat */
+#menuButton {
+  background-color: var(--theme-accent);
+  color: white;
+}
+    /* Mörkt läge – formulär och meny */
+body[data-theme="dark"] #mainMenu,
+body[data-theme="dark"] main section {
+  background-color: #343246;
+  color: #f1edf8;
+}
+
+body[data-theme="dark"] input,
+body[data-theme="dark"] select,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] #mainMenu button {
+  background-color: #454259;
+  color: #ffffff;
+  border-color: #817a9b;
+}
+    /* Menyn följer valt färgtema */
+body:not([data-theme="dark"]) #mainMenu {
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
+}
+
+body:not([data-theme="dark"]) #mainMenu button {
+  color: var(--theme-text);
+}
+    /* Prioritetsgrupper: kolumner på större skärmar, staplade på mobil. */
+#tasks.task-columns08 { display:grid; grid-template-columns:1fr; gap:12px; align-items:start; }
+#tasks.task-columns08 > .task-priority-group08 { margin:0; min-width:0; }
+#tasks .task-group-content08 > .panel { overflow-wrap:anywhere; }
+#tasks .task-priority-group08 summary { list-style-position:inside; }
+@media (min-width:850px) { #tasks.task-columns08 { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    /* Läsbar text i ljusa rutor */
+body[data-theme="dark"] #dailyPage li,
+body[data-theme="dark"] #dailyPage p {
+    color: #30263b;
+}
+    /* Tydlig text i veckoplaneringen */
+body[data-theme="dark"] #weekPage .week {
+    color: #30263b;
+}
+
+body[data-theme="dark"] #weekPage .week * {
+    color: #30263b;
+}
+    /* Tydlig text i meddelanderutan */
+body[data-theme="dark"] #message {
+    color: #30263b;
+}
+    /* Läsbara uppgiftsrubriker i mörkt läge */
+body[data-theme="dark"] #tasksPage .panel {
+  color: #30263b;
+}
+    /* Läsbara påminnelser i mörkt läge */
+body[data-theme="dark"] #reminders {
+  color: #30263b;
+}
+    /* Läsbar text i ljusa rutor i mörkt läge */
+body[data-theme="dark"] #pause,
+body[data-theme="dark"] #steps,
+body[data-theme="dark"] #idea {
+  color: #30263b;
+}
+    main section[hidden] { display: none !important; }
+/* Tydlig, lugn inloggning med god läsbarhet */
+[hidden] { display: none !important; }
+#loginSection { max-width: 480px; margin: 28px auto 40px; padding: clamp(20px,5vw,36px); background: #fff; border: 1px solid #e3d9ed; border-radius: 22px; box-shadow: 0 12px 36px #392d4714; }
+#loginSection h2 { margin-top: 0; line-height: 1.25; }
+#loginSection input { min-height: 48px; background: white; }
+#loginSection button { min-height: 48px; font-weight: 650; }
+#loginButton { width: 100%; margin: 18px 0 8px; }
+#signupButton { width: 100%; margin: 0 0 8px; background: #eae1f4; color: #392d47; }
+#resetPasswordButton { background: transparent; color: #563879; text-decoration: underline; padding-left: 0; }
+#loginMessage:not(:empty) { padding: 12px; background: #f1eaf8; border-radius: 10px; }
+#headerLogout { background: #fff; color: #4c3070; border: 2px solid #9270c3; min-height: 46px; font-weight: 650; }
+#headerActions { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+#menuButton { float: none; margin: 0; }
+#loginSection :focus-visible, #headerActions :focus-visible { outline: 3px solid #51377c; outline-offset: 3px; }
+body[data-theme="dark"] #loginSection { background: #343246; color: #f1edf8; border-color: #817a9b; }
+body[data-theme="dark"] #loginMessage:not(:empty) { background: #454259; }
+body[data-theme="dark"] #resetPasswordButton { color: #e6d5ff; }
+@media (max-width: 480px) { #headerActions button { flex: 1; } }
+
+
+/* Tillgänglighet: läsbar text i inloggning och ljusa kontopaneler */
+#loginSection input[type="email"],
+#loginSection input[type="password"] {
+  background: #ffffff !important;
+  color: #24202e !important;
+  -webkit-text-fill-color: #24202e !important;
+  caret-color: #24202e !important;
+  border: 2px solid #75618b !important;
+  color-scheme: light;
+}
+#loginSection input::placeholder { color: #62566f !important; opacity: 1; }
+#loginSection input:focus-visible { outline: 3px solid #b59be0; outline-offset: 2px; }
+#syncPanel, #syncPanel h3, #syncPanel p, #syncStatus {
+  color: #30263b !important;
+}
+#backupPage .notice.warning {
+  color: #30263b !important;
+}
+
+
+/* 0.8 testfix: tydlig kontrast i Idébanken i alla teman */
+#smartIdeasPanel, #smartIdeasPanel h3, #smartIdeasPanel p,
+#smartIdeasPanel label, #smartResult, #smartResult li,
+#ideasPage #premiumIdeas08, #ideasPage #premiumIdeas08 h3,
+#ideasPage #premiumIdeas08 p { color: #30263b !important; }
+#smartIdeasPanel, #ideasPage #premiumIdeas08 { background: #f7f3fc !important; }
+#smartResult { background: #ffffff !important; }
+#smartCategory { background: #454259 !important; color: #ffffff !important; }
+#ideaBackControls { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+#ideaBackControls button { margin: 0; }
+
+/* 0.9: Kontrastfix för Idébanken och AI-kompisen i mörkt läge.
+   Ljusa kort behåller mörk text; mörka ytor får ljus text. */
+body[data-theme="dark"] #ideasPage > h2,
+body[data-theme="dark"] #ideasPage > h3,
+body[data-theme="dark"] #aiPage > h2 { color: #f1edf8; }
+body[data-theme="dark"] #ideasPage #ownPlan08,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel,
+body[data-theme="dark"] #ideasPage #premiumIdeas08,
+body[data-theme="dark"] #aiPage .panel,
+body[data-theme="dark"] #aiPage .notice {
+  background: #f7f3fc !important;
+  color: #30263b !important;
+}
+body[data-theme="dark"] #ideasPage #ownPlan08 *,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel h3,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel p,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel label,
+body[data-theme="dark"] #ideasPage #premiumIdeas08 *,
+body[data-theme="dark"] #aiPage .panel *,
+body[data-theme="dark"] #aiPage .notice * {
+  color: #30263b;
+}
+body[data-theme="dark"] #ideasPage #ownPlan08 input,
+body[data-theme="dark"] #ideasPage #ownPlan08 textarea,
+body[data-theme="dark"] #ideasPage #ownPlan08 select,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel select {
+  background: #ffffff !important;
+  color: #30263b !important;
+  border-color: #75618b !important;
+}
+body[data-theme="dark"] #ideasPage #ownPlan08 textarea::placeholder,
+body[data-theme="dark"] #aiPage textarea::placeholder { color: #70617d; opacity: 1; }
+body[data-theme="dark"] #ideasPage #ownPlan08 button,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel button { color: #ffffff; }
+body[data-theme="dark"] #ideasPage #ownPlan08 button.alt,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel button.alt { color: #563879; }
+body[data-theme="dark"] #aiPage .small { color: #f1edf8; }
+body[data-theme="dark"] #aiPage #aiMessages { color: #30263b !important; }
+body[data-theme="dark"] #aiPage #aiMessages * { color: inherit; }
+body[data-theme="dark"] #aiPage textarea,
+body[data-theme="dark"] #aiPage select { color: #ffffff; background: #454259; }
+body[data-theme="dark"] #aiPage button.alt { color: #563879; background: #eae1f4; }
+body[data-theme="dark"] #ideasPage #ownPlan08 .small { color: #51435f; }
+
+/* 0.9: sammanhängande mörkt tema på samtliga sidor.
+   Läggs sist för att ersätta äldre regler som tvingade fram ljusa kort. */
+body[data-theme="dark"] { color-scheme: dark; }
+body[data-theme="dark"] main section,
+body[data-theme="dark"] main .panel,
+body[data-theme="dark"] main .notice,
+body[data-theme="dark"] main .warning,
+body[data-theme="dark"] #smartIdeasPanel,
+body[data-theme="dark"] #smartResult,
+body[data-theme="dark"] #premiumIdeas08,
+body[data-theme="dark"] #ownPlan08,
+body[data-theme="dark"] #aiMessages,
+body[data-theme="dark"] #syncPanel,
+body[data-theme="dark"] #loginSection {
+  background-color: #343246 !important;
+  color: #f1edf8 !important;
+  border-color: #817a9b;
+}
+body[data-theme="dark"] main .panel,
+body[data-theme="dark"] main .notice,
+body[data-theme="dark"] main .warning,
+body[data-theme="dark"] #smartResult,
+body[data-theme="dark"] #aiMessages,
+body[data-theme="dark"] #loginMessage:not(:empty) {
+  background-color: #444158 !important;
+}
+body[data-theme="dark"] main section h1,
+body[data-theme="dark"] main section h2,
+body[data-theme="dark"] main section h3,
+body[data-theme="dark"] main section p,
+body[data-theme="dark"] main section li,
+body[data-theme="dark"] main section label,
+body[data-theme="dark"] main section strong,
+body[data-theme="dark"] main section summary,
+body[data-theme="dark"] main section .small,
+body[data-theme="dark"] #syncPanel,
+body[data-theme="dark"] #syncPanel h3,
+body[data-theme="dark"] #syncPanel p,
+body[data-theme="dark"] #syncStatus,
+body[data-theme="dark"] #smartIdeasPanel *,
+body[data-theme="dark"] #premiumIdeas08 *,
+body[data-theme="dark"] #ownPlan08 *,
+body[data-theme="dark"] #aiMessages *,
+body[data-theme="dark"] #backupPage .notice.warning {
+  color: #f1edf8 !important;
+}
+body[data-theme="dark"] main input:not([type="checkbox"]),
+body[data-theme="dark"] main textarea,
+body[data-theme="dark"] main select,
+body[data-theme="dark"] #smartCategory,
+body[data-theme="dark"] #ownPlan08 textarea,
+body[data-theme="dark"] #ownPlan08 select {
+  background-color: #454259 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+  border-color: #9b94b1 !important;
+  color-scheme: dark;
+}
+body[data-theme="dark"] main input::placeholder,
+body[data-theme="dark"] main textarea::placeholder {
+  color: #d3cadd !important;
+  opacity: 1;
+}
+body[data-theme="dark"] main button:not(.alt),
+body[data-theme="dark"] #ownPlan08 button:not(.alt),
+body[data-theme="dark"] #smartIdeasPanel button:not(.alt) {
+  color: #ffffff !important;
+}
+body[data-theme="dark"] main button.alt {
+  background: #625378 !important;
+  color: #ffffff !important;
+}
+body[data-theme="dark"] #clock,
+body[data-theme="dark"] footer { color: #f1edf8 !important; }
+body[data-theme="dark"] #loginSection input[type="email"],
+body[data-theme="dark"] #loginSection input[type="password"] {
+  background: #454259 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  color-scheme: dark;
+}
+body[data-theme="dark"] #loginSection input::placeholder { color: #d3cadd !important; }
+body[data-theme="dark"] #headerLogout { background: #454259; color: #ffffff; }
+
+
+/* 0.9: slutlig mörk kontrastfix – mer specifik än äldre ljusa !important-regler. */
+body[data-theme="dark"] #ideasPage #smartIdeasPanel,
+body[data-theme="dark"] #ideasPage #ownPlan08,
+body[data-theme="dark"] #ideasPage #premiumIdeas08,
+body[data-theme="dark"] #aiPage .panel,
+body[data-theme="dark"] #aiPage .notice {
+  background: #343246 !important;
+  color: #f1edf8 !important;
+  border-color: #817a9b !important;
+}
+body[data-theme="dark"] #ideasPage #smartIdeasPanel h3,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel p,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel label,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel .small,
+body[data-theme="dark"] #ideasPage #ownPlan08 *,
+body[data-theme="dark"] #ideasPage #premiumIdeas08 *,
+body[data-theme="dark"] #aiPage .notice *,
+body[data-theme="dark"] #aiPage .panel *,
+body[data-theme="dark"] #aiPage #aiMessages,
+body[data-theme="dark"] #aiPage #aiMessages * {
+  color: #f1edf8 !important;
+}
+body[data-theme="dark"] #ideasPage #smartResult,
+body[data-theme="dark"] #aiPage #aiMessages,
+body[data-theme="dark"] #aiPage .notice {
+  background: #444158 !important;
+  color: #f1edf8 !important;
+}
+body[data-theme="dark"] #ideasPage #smartResult,
+body[data-theme="dark"] #ideasPage #smartResult * {
+  color: #f1edf8 !important;
+}
+body[data-theme="dark"] #ideasPage #ownPlan08 input,
+body[data-theme="dark"] #ideasPage #ownPlan08 textarea,
+body[data-theme="dark"] #ideasPage #ownPlan08 select,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel select,
+body[data-theme="dark"] #aiPage select,
+body[data-theme="dark"] #aiPage textarea {
+  background: #454259 !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  border-color: #9b94b1 !important;
+  color-scheme: dark;
+}
+body[data-theme="dark"] #ideasPage #ownPlan08 textarea::placeholder,
+body[data-theme="dark"] #aiPage textarea::placeholder {
+  color: #d3cadd !important;
+  -webkit-text-fill-color: #d3cadd !important;
+}
+body[data-theme="dark"] #backupPage label[for="import"].alt {
+  display: inline-block;
+  background: #625378 !important;
+  color: #ffffff !important;
+  border: 1px solid #9b94b1 !important;
+}
+body[data-theme="dark"] #backupPage label[for="import"].alt:focus-visible {
+  outline: 3px solid #c4a6ff;
+  outline-offset: 2px;
+}
+body[data-theme="dark"] #ideasPage #ownPlan08 button,
+body[data-theme="dark"] #ideasPage #smartIdeasPanel button,
+body[data-theme="dark"] #aiPage button {
+  color: #ffffff !important;
+}
+
+/* Mina rutiner: tillgänglig layout i både ljust och mörkt tema */
+.routine-card09 progress{display:block;width:100%;height:15px;accent-color:var(--theme-accent);margin:8px 0 15px}
+.routine-step09{display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid #d9c8e8;cursor:pointer}
+.routine-step09 input{width:22px;height:22px;flex-shrink:0;accent-color:var(--theme-accent)}
+.routine-step09 span{overflow-wrap:anywhere}.routine-step09 input:checked+span{text-decoration:line-through;opacity:.75}
+body[data-theme="dark"] #routinesPage .panel{background:#444158;color:#f1edf8}
+body[data-theme="dark"] #routinesPage .routine-step09{border-color:#817a9b}
+body[data-theme="dark"] #routinesPage h3,body[data-theme="dark"] #routinesPage .small{color:#f1edf8}
+.routine-edit09{margin:12px 0;padding:14px;border:1px solid #b6a4d0;border-radius:12px}
+.routine-edit09 label{display:block;margin-top:10px}
+.routine-edit09 input,.routine-edit09 select,.routine-edit09 textarea{width:100%;box-sizing:border-box}
+.routine-edit09 .actions{margin-top:12px}
+body[data-theme="dark"] .routine-edit09{background:#383348;border-color:#a69abb;color:#f6f1ff}
+body[data-theme="dark"] .routine-edit09 input,body[data-theme="dark"] .routine-edit09 select,body[data-theme="dark"] .routine-edit09 textarea{background:#292534;color:#fff;border:1px solid #a69abb}
+button:focus-visible, textarea:focus-visible { outline:3px solid #68458e; outline-offset:3px; }
+#kickoffPage button { min-height:44px; }
+
+/* Bildstöd 0.9: stora, diskreta symboler utan externa bildfiler. */
+.visual09{display:inline-flex;align-items:center;justify-content:center;min-width:2.15em;min-height:2.15em;margin-right:.55em;padding:.12em;border-radius:12px;background:#f0e9fa;border:1px solid #d8c9ea;font-size:1.2em;vertical-align:middle;flex-shrink:0}
+.visual09[hidden]{display:none!important}
+.visual09-row{display:flex;align-items:center;gap:4px;overflow-wrap:anywhere}
+body[data-theme="dark"] .visual09{background:#e9e0f5;color:#30263b;border-color:#c2afd9}
+#visual09Setting{width:22px;height:22px;vertical-align:middle}
+#visual09SettingLabel{display:flex;align-items:center;gap:10px;margin:12px 0}
+/* Fokuskompisen 1.0 – designförslag. Endast visuella förbättringar. */
+:root{--fk-radius:20px;--fk-shadow:0 12px 34px rgba(42,25,68,.08)}
+body{line-height:1.6;-webkit-font-smoothing:antialiased}
+header{padding:30px 16px 25px;max-width:950px;margin:auto}
+header h1{font-size:clamp(1.8rem,4vw,2.55rem);letter-spacing:-.035em;line-height:1.2}
+header>p{margin:20px auto 0;max-width:38ch;line-height:1.5}
+main{max-width:900px;padding:0 clamp(12px,3vw,22px)}
+main>section{border-radius:var(--fk-radius);padding:clamp(20px,3.5vw,32px);box-shadow:var(--fk-shadow);border:1px solid rgba(142,115,175,.15)}
+h2{font-size:clamp(1.35rem,2.6vw,1.7rem);letter-spacing:-.02em;line-height:1.3}
+h3{line-height:1.35}
+button{min-height:46px;padding:11px 17px;border-radius:12px;font-weight:650;line-height:1.3;transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease}
+button:hover{filter:brightness(1.07)}
+button:active{filter:brightness(.95)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #c8a8ff;outline-offset:3px}
+input:not([type=checkbox]),textarea,select{min-height:46px;border-radius:12px;padding:12px 14px}
+textarea{min-height:90px}
+#headerActions{gap:12px;margin-top:22px}
+#menuButton{float:none;border-radius:13px;padding:12px 22px;box-shadow:0 4px 12px rgba(90,60,130,.13)}
+#headerLogout{border-radius:13px;background:transparent;color:var(--theme-text);border:2px solid var(--theme-accent)}
+#mainMenu{max-width:690px;margin:18px auto 0;padding:14px;border-radius:20px;box-shadow:var(--fk-shadow);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#mainMenu[hidden]{display:none}
+#mainMenu button{display:block;width:100%;min-height:52px;margin:0;padding:13px 15px;border-radius:12px;font-weight:600;text-align:left;overflow-wrap:anywhere}
+#mainMenu button:hover{border-color:var(--theme-accent);box-shadow:inset 4px 0 0 var(--theme-accent)}
+#homePage>h2{margin-top:0}
+#homePage #energy{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 20px}
+#homePage #energy button{margin:0;min-width:104px;border:2px solid transparent}
+#homePage #energy button.selected,#homePage #energy button[aria-pressed="true"]{border-color:#f3e9ff;box-shadow:0 0 0 3px var(--theme-accent)}
+#homePage #message{border-left:4px solid var(--theme-accent);padding:15px 17px}
+#personalHome{margin-top:26px}
+#personalHome>h2{margin-bottom:6px}
+#homeWidgets{display:block}
+#homeTasksWidget,#homeScheduleWidget,#homeRemindersWidget{padding:17px 19px;margin:14px 0;border:1px solid rgba(157,136,181,.25);border-radius:16px;background:rgba(161,132,198,.09)}
+#homeTasksWidget h3,#homeScheduleWidget h3,#homeRemindersWidget h3{margin:0 0 10px;font-size:1.08rem}
+#homeTasksWidget p,#homeScheduleWidget p,#homeRemindersWidget p{margin:6px 0}
+.panel{border-radius:14px}
+body[data-theme="dark"] header h1,body[data-theme="dark"] main>section>h2{color:#d3b4ff}
+body[data-theme="dark"] #homeTasksWidget,body[data-theme="dark"] #homeScheduleWidget,body[data-theme="dark"] #homeRemindersWidget{background:#403b54;border-color:#665c80;color:#f7f3ff}
+body[data-theme="dark"] #homeTasksWidget *,body[data-theme="dark"] #homeScheduleWidget *,body[data-theme="dark"] #homeRemindersWidget *{color:inherit}
+body[data-theme="dark"] #homePage #message{background:#454259;color:#fff}
+body[data-theme="dark"] #headerLogout{color:#f1edf8}
+body[data-theme="dark"] #mainMenu{border-color:#74688e}
+body[data-theme="dark"] #mainMenu button:hover{background:#514a68}
+footer{padding:26px 16px 36px;font-size:.9rem}
+@media(max-width:600px){header{padding-top:24px}main>section{padding:19px 16px}#mainMenu{grid-template-columns:1fr}#headerActions{align-items:stretch}#headerActions button{flex:1;min-width:130px}#homePage #energy button{flex:1;min-width:90px}#homeTasksWidget,#homeScheduleWidget,#homeRemindersWidget{padding:15px}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
+
+</style>
+<style id="welcome-guide-style">
+#welcomeGuideOverlay[hidden]{display:none!important}
+#welcomeGuideOverlay{position:fixed;inset:0;z-index:9999;background:rgba(13,8,29,.82);display:flex;align-items:center;justify-content:center;padding:18px}
+#welcomeGuideDialog{box-sizing:border-box;width:min(100%,470px);max-height:90vh;overflow:auto;background:#25163e;color:#fff;border:1px solid #a88ad3;border-radius:22px;padding:26px;box-shadow:0 20px 70px rgba(0,0,0,.5);text-align:center}
+#welcomeGuideDialog h2{font-size:1.45rem;line-height:1.3;margin:12px 0}
+#welcomeGuideDialog p{line-height:1.6;color:#f0e8ff}
+#welcomeGuideDialog .guide-symbol{font-size:2.5rem}
+#welcomeGuideDialog .guide-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;justify-content:center}
+#welcomeGuideDialog button{min-height:44px;border-radius:12px;padding:10px 16px;border:1px solid #b8a3e0;background:#7452aa;color:#fff;font:inherit;cursor:pointer}
+#welcomeGuideDialog button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#welcomeGuideDialog button.guide-secondary{background:transparent}
+#welcomeGuideDialog .guide-count{font-size:.85rem;color:#e6d8fc}
+</style>
+<style id="help10Styles">
+.help10 details {border:1px solid var(--theme-accent,#9671bd);border-radius:14px;margin:10px 0;padding:0 14px;background:rgba(151,112,195,.09)}
+.help10 summary {cursor:pointer;font-weight:650;padding:15px 0;line-height:1.5;list-style-position:inside}
+.help10 details p {margin:0 0 16px;line-height:1.65}
+.help10 summary:focus-visible,.help10 button:focus-visible {outline:3px solid #b69ae5;outline-offset:3px}
+.help10 h3 {margin-top:26px}
+@media(max-width:480px){.help10 details {padding:0 11px}.help10 summary{padding:16px 0}}
+</style><style>
+/* Fokuskompisen 1.4: lugnt läge med lättlästa knappar i båda teman */
+.calm14Page{max-width:760px;margin:0 auto}
+.calm14Choices{display:flex;flex-direction:column;gap:14px;margin:24px 0}
+.calm14Choices button,.calm14Quick{min-height:56px;white-space:normal;line-height:1.5;padding:14px 18px}
+.calm14Choices button{width:100%;text-align:left}
+body[data-theme="dark"] .calm14Choices button,body[data-theme="dark"] .calm14Quick{background:#49415f;color:#fff;border:2px solid #aa96c7}
+body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dark"] .calm14Quick:focus-visible{outline:3px solid #e1caff;outline-offset:3px}
+</style>
+<style id="visual-schedule-15-css">
+.visual-card15{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:14px;margin:10px 0;border:1px solid #a78bca;border-radius:14px;background:rgba(126,87,194,.12);color:inherit}
+.visual-icon15{font-size:1.8rem;min-width:54px;min-height:54px;background:rgba(126,87,194,.20);border-radius:12px;padding:6px}
+.visual-label15{flex:1;min-width:125px;overflow-wrap:anywhere}
+.visual-card15 input[type=checkbox]{width:23px;height:23px;flex-shrink:0}
+.visual-actions15{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.visual-actions15 button{flex:1;min-width:105px}
+.visual-done15 .visual-label15{text-decoration:line-through;opacity:.65}
+</style>
+</head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+<script>
+  const SUPABASE_URL = "https://askqdwonkjulrpjikarj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_gANhM8Y6lEqH2QaVKvylVQ_fpQ4hfoK";
+  const fokusSupabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+</script>
+
+  <body>
+        <header><h1>💜 Fokuskompisen</h1><div id="headerActions" hidden><button id="menuButton" type="button" aria-label="Öppna menyn" aria-expanded="false">☰ Meny</button><button id="headerLogout" type="button">🚪 Logga ut</button></div><nav id="mainMenu" aria-label="Huvudmeny" hidden>
+<label for="menuSearch13">Sök i menyn</label><input id="menuSearch13" type="search" placeholder="Sök efter en funktion..." autocomplete="off">
+<button type="button" data-page="home">🏠 Startsida</button>
+<details class="menuGroup13"><summary>📅 Planera min vardag</summary>
+<button type="button" data-page="schedule">Mitt dagsschema</button>
+<button type="button" data-page="daily">Min dag</button>
+<button type="button" data-page="week">Veckoplanering</button>
+<button type="button" data-page="routines">Mina rutiner</button>
+<button type="button" data-page="reminders">Mina påminnelser</button>
+</details>
+<details class="menuGroup13"><summary>🎯 Uppgifter och fokus</summary>
+<button type="button" data-page="tasks">Mina uppgifter</button>
+<button type="button" data-page="addTask">Ny uppgift</button>
+<button type="button" data-page="focus11">Fokusläge</button>
+<button type="button" data-page="calm14">💜 Det är för mycket just nu</button>
+<button type="button" data-page="kickoff">Hjälp mig komma igång</button>
+<button type="button" data-page="steps">Små steg</button>
+</details>
+<details class="menuGroup13"><summary>💜 Mående och framsteg</summary>
+<button type="button" data-page="progress">Mina framsteg</button>
+<button type="button" data-page="wins13">Mina små segrar</button>
+<button type="button" data-page="pause">Pauskompis</button>
+</details>
+<details class="menuGroup13"><summary>🌷 Övrigt och inställningar</summary>
+<button type="button" data-page="ideas">Idébank</button>
+<button type="button" data-page="ai">AI-kompisen (demo)</button>
+<button type="button" data-page="settings">Inställningar</button>
+<button type="button" data-page="backup">Säkerhetskopia</button>
+<button type="button" data-page="help">Hjälp och information</button>
+</details>
+<details class="menuGroup13"><summary>🔐 Konto och hjälp</summary><button type="button" id="welcomeGuideOpen" aria-label="Visa välkomstguiden">💜 Välkomstguide</button><button type="button" id="deleteAccountButton" style="color:#b42332;font-weight:700">🗑️ Radera mitt konto</button></details></nav><p>En sak i taget. Du bestämmer takten.</p></header>
+      <main>
+      <section id="loginSection" class="panel" aria-label="Inloggning">
+  <h2>Välkommen till Fokuskompisen 💜</h2><p>En lugnare vardag, ett steg i taget. Logga in eller skapa ett konto för att fortsätta.</p>
+          <label for="loginEmail">E-postadress</label>
+<input type="email" id="loginEmail" autocomplete="email" placeholder="Din e-postadress">
+          <label for="loginPassword">Lösenord</label>
+<input type="password" id="loginPassword" autocomplete="current-password" minlength="12" placeholder="Ditt lösenord">
+          <button type="button" id="loginButton">🔐 Logga in</button>
+          <button type="button" id="signupButton">💜 Skapa konto</button>
+          <p id="loginMessage" role="status" aria-live="polite"></p>
+          <button type="button" id="resetPasswordButton">🔑 Glömt lösenordet?</button>
+          <div id="newPasswordSection" hidden>
+  <h3>🔑 Välj ett nytt lösenord</h3>
+  <label for="newPassword">Nytt lösenord</label>
+  <input type="password" id="newPassword" minlength="12" autocomplete="new-password" placeholder="Minst 12 tecken">
+  <button type="button" id="saveNewPasswordButton">💜 Spara nytt lösenord</button>
+  <p id="newPasswordMessage" role="status"></p>
+</div>
+
+</section>
+    
+<section id="homePage" hidden><h2 id="hello">Hej!</h2><p><button type="button" id="calm14Quick" class="calm14Quick">💜 Det är för mycket just nu</button></p><label for="name">Vad vill du bli kallad? (frivilligt)</label><input id="name" placeholder="Ditt namn"><p><strong>Hur mycket energi har du?</strong></p><div id="energy"><button data-energy="low">🪫 Låg</button><button data-energy="medium">🔋 Lagom</button><button data-energy="high">⚡ Hög</button></div><details id="mood12Panel" style="margin:16px 0;padding:14px;border:1px solid #bda9d8;border-radius:12px"><summary><strong>💜 Mitt mående – senaste 7 dagarna</strong></summary><p>Frivilligt. Du väljer själv om du vill spara dagens energi. Tidigare dagar kan raderas.</p><button type="button" id="mood12Save">Spara dagens energi</button><p id="mood12Notice" role="status" aria-live="polite"></p><div id="mood12History"></div></details><label for="feeling">Hur känns dagen? (frivilligt)</label><textarea id="feeling"></textarea><p class="panel" id="message">Du behöver inte göra allt idag.</p>
+<div id="personalHome">
+  <h2>🏠 Min personliga startsida</h2>
+  <p>Här kan du se det som är viktigast för dig idag.</p>
+  <div id="homeWidgets">
+  <div id="homeTasksWidget">
+    <h3>✅ Dagens uppgifter</h3>
+    <div id="homeTasksContent">
+      <p>Här kommer dagens uppgifter att visas.</p>
+    </div>
+  </div>
+</div>
+    <div id="homeScheduleWidget">
+  <h3>📅 Mitt dagsschema</h3>
+  <div id="homeScheduleContent">
+    <p>Här kommer dagens schema att visas.</p>
+  </div>
+<div id="homeRemindersWidget">
+  <h3>🔔 Mina påminnelser</h3>
+  <div id="homeRemindersContent">
+    <p>Här kommer dina påminnelser att visas.</p>
+  </div>
+</div>
+</div>
+    </section>
+    <section id="focus11Page" hidden aria-labelledby="focus11Heading">
+<h2 id="focus11Heading">🎯 Fokusläge – en sak i taget</h2>
+<p>Välj en uppgift och fokusera på den. Du bestämmer takten. 💜</p>
+<div class="panel"><label for="focus11Choose">Vad vill du fokusera på?</label>
+<select id="focus11Choose"><option value="">Välj en uppgift</option></select>
+<div id="focus11Current" class="panel" aria-live="polite">Välj en uppgift för att börja.</div>
+<div class="flex"><button type="button" id="focus11Start">▶️ Börja</button><button type="button" id="focus11Pause">☕ Ta paus</button><button type="button" id="focus11Done">✅ Jag är klar</button></div>
+<p id="focus11Status" role="status" aria-live="polite"></p></div>
+<p class="small">Fokusläge skapar inga nya uppgifter och ändrar inget förrän du väljer ”Jag är klar”.</p>
+</section>
+<section id="addTaskPage"><h2>➕ Ny uppgift</h2><form id="add"><label for="task">Vad vill du göra?</label><input id="task" required maxlength="150" placeholder="Till exempel handla mat"><div class="flex"><div><label for="date">Datum (frivilligt)</label><input type="date" id="date"></div><div><label for="priority">Din prioritet</label><select id="priority"><option value="today">Måste göras idag</option><option value="soon">Bra om det blir gjort</option><option value="later">Kan vänta</option></select></div></div><div class="flex"><div><label for="repeat">Upprepa</label><select id="repeat"><option value="none">Inte återkommande</option><option value="daily">Varje dag</option><option value="weekly">Varje vecka</option></select></div><div><label for="remind">Påminn mig i appen (frivilligt)</label><input type="time" id="remind"></div></div><button>Lägg till</button></form><p class="small">Du bestämmer vad som är viktigast. Fokuskompisen bestämmer aldrig åt dig.</p></section>
+<section id="progressPage" hidden aria-labelledby="progressHeading">
+<h2 id="progressHeading">💜 Mina framsteg</h2>
+<p>Här får du se det du har gjort, i din egen takt. Det finns inga mål du måste nå.</p>
+<div class="panel"><h3>🌷 Idag</h3><p id="progressToday" aria-live="polite"></p></div>
+<div class="panel"><h3>🗓️ Den här veckan</h3><p id="progressWeek" aria-live="polite"></p><div id="progressDays" class="week"></div></div>
+<div class="panel"><h3>💜 Dina avklarade uppgifter</h3><div id="progressItems"></div></div>
+<p class="small">Framsteg börjar registreras när du markerar uppgifter som klara i denna version. Äldre avklarade uppgifter visas separat om de saknar datum. Uppgifter som ångras tas bort från sammanställningen. Informationen sparas med ditt konto och ingår i JSON-säkerhetskopian. Ingen AI eller internetuppkoppling krävs för att visa sparade framsteg.</p>
+</section>
+<section id="calm14Page" hidden aria-labelledby="calm14Heading" class="calm14Page">
+<h2 id="calm14Heading">💜 Det är för mycket just nu</h2>
+<p>Du behöver inte göra allt på en gång. Välj det som känns bäst för dig just nu.</p>
+<div class="calm14Choices">
+<button type="button" id="calm14Pause">☕ Ta en paus</button>
+<button type="button" id="calm14One">🎯 Välj en liten uppgift</button>
+<button type="button" id="calm14Back">🏠 Tillbaka till vardagen</button>
+</div>
+<p class="small">Du bestämmer takten. Inget registreras när du använder det här läget.</p>
+</section>
+<section id="wins13Page" hidden aria-labelledby="wins13Heading"><h2 id="wins13Heading">💜 Mina små segrar</h2><p>Även det lilla räknas. Här finns inga poäng eller krav.</p><div class="panel"><label for="wins13Input">Vad har du klarat av?</label><input id="wins13Input" maxlength="160" placeholder="Till exempel: Jag tog en paus"><button type="button" id="wins13Add">🌷 Spara min seger</button><p id="wins13Message" role="status" aria-live="polite"></p></div><div class="panel"><h3>🌷 Mina egna segrar</h3><div id="wins13List"></div></div><p class="small">Egna segrar sparas endast i den här webbläsaren, separat för varje inloggat konto. De synkroniseras inte mellan enheter och ingår inte i JSON-säkerhetskopian ännu. Undvik känsliga detaljer på delade enheter.</p></section>
+<section id="routinesPage" hidden>
+<h2>🌅 Mina rutiner</h2>
+<p>Gör vardagen enklare med små steg. Bocka av i din egen takt. Stegen börjar om nästa dag, men rutinerna finns kvar.</p>
+<div class="panel" id="routineCreatePanel">
+<h3>Skapa en rutin</h3>
+<label for="routineName">Namn på rutinen</label><input id="routineName" maxlength="80" placeholder="Till exempel: Min morgonrutin">
+<label for="routineType">När passar den?</label><select id="routineType"><option value="morning">🌅 Morgon</option><option value="evening">🌙 Kväll</option><option value="other">🌷 Annan rutin</option></select>
+<label for="routineSteps">Steg – skriv ett steg per rad</label><textarea id="routineSteps" rows="5" maxlength="1500" placeholder="Gå upp ur sängen&#10;Borsta tänderna&#10;Äta frukost"></textarea>
+<button type="button" id="routineAdd">➕ Spara rutin</button><p id="routineStatus" role="status" aria-live="polite" class="small"></p>
+</div>
+<div id="routineList" aria-live="polite"></div>
+<p class="small">Rutinerna sparas med ditt konto och ingår i Fokuskompisens JSON-säkerhetskopia. Inga påminnelser skickas när appen är stängd.</p>
+</section>
+<section id="remindersPage"><h2>🔔 Mina påminnelser</h2><p class="small">Påminnelser visas när appen är öppen. Inga pushnotiser skickas när appen är stängd.</p><div id="reminders" aria-live="polite"></div></section>
+<section id="tasksPage"><h2>📝 Mina uppgifter</h2><div id="tasks"></div></section><section id="dailyPage"><h2>🌷 Min dag</h2><div id="daily"></div></section>
+  <section id="schedule"><h2>📅 Mitt dagsschema</h2><p class="small">Välj en symbol för varje aktivitet och bocka av det du gjort. Dina befintliga aktiviteter finns kvar.</p><button type="button" id="addScheduleActivity">➕ Lägg till aktivitet</button><div id="scheduleActivities" aria-live="polite"></div></section>
+  <section id="weekPage"><h2>🗓️ Veckans överblick</h2><div class="week" id="week"></div></section>
+<section id="kickoffPage" hidden aria-labelledby="kickoffHeading">
+<h2 id="kickoffHeading">🌱 Hjälp mig komma igång</h2>
+<p>En liten sak i taget. Du bestämmer när det räcker.</p>
+<p class="small">Gratis stöd med färdiga förslag, utan AI. Fungerar offline när appen har laddats på enheten.</p>
+<form id="kickoffForm"><label for="kickoffInput">Vad vill du ha hjälp att börja med?</label>
+<textarea id="kickoffInput" maxlength="300" required placeholder="Till exempel: Städa sovrummet" aria-describedby="kickoffHint"></textarea>
+<p id="kickoffHint" class="small">Förslagen är enkla och kan behöva anpassas. Skriv gärna en uppgift i taget.</p>
+<button type="submit">Visa ett litet första steg</button></form>
+<div id="kickoffResult" hidden class="panel" style="color:#30263b" role="status" aria-live="polite" aria-atomic="true">
+<p id="kickoffTask" style="overflow-wrap:anywhere"></p><p id="kickoffProgress" class="small"></p><p id="kickoffStep" style="font-size:1.15em"></p>
+</div><div id="kickoffActions" hidden class="actions">
+<button type="button" id="kickoffNext">Nästa steg</button><button type="button" id="kickoffPause" class="alt">Ta paus</button><button type="button" id="kickoffDone" class="alt">Jag är klar</button></div>
+<p id="kickoffStorage" class="small" role="status"></p>
+<p class="small">Påbörjad hjälp sparas bara för ditt konto i den här webbläsaren. Den ingår inte i säkerhetskopian och ändrar inte dina uppgifter eller rutiner.</p>
+</section>
+<section id="stepsPage"><h2>👣 Små steg</h2><label for="choose">Välj en uppgift</label><select id="choose"></select><div id="steps" class="panel">Välj en uppgift för att få hjälp med små steg.</div></section>
+<section id="pausePage"><h2>☕ Pauskompis</h2><p>En paus är också viktig. Starta en paus på 20 minuter när du vill.</p><div id="clock">20:00</div><button id="start">Starta paus</button><button class="alt" id="stop">Stoppa och återställ</button><p id="pause" class="panel">Du bestämmer när du är redo igen.</p></section>
+<section id="backupPage"><h2>💾 Säkerhetskopia</h2><p>Exportera dina uppgifter till en JSON-fil innan du uppdaterar eller byter mobil. Förvara filen privat – den kan innehålla personliga uppgifter.</p><div class="actions"><button type="button" id="export">Ladda ner säkerhetskopia</button><label for="import" class="alt" tabindex="0" style="display:inline-block;padding:10px;border-radius:9px;cursor:pointer">Välj säkerhetskopia</label><input type="file" id="import" accept=".json,application/json" style="max-width:240px"></div><p class="notice warning">Import ersätter uppgifterna på det inloggade kontot efter synkronisering. Exportera gärna en kopia först. Du får bekräfta innan något ändras.</p><p id="status" role="status"></p><div class="panel" id="syncPanel"><h3>☁️ Mina uppgifter på mitt konto</h3><p id="syncStatus" role="status" aria-live="polite">Kontrollerar synkronisering…</p><button type="button" id="migrateTasks" hidden>📥 Kopiera mina tidigare uppgifter till kontot</button><p class="small">Dina tidigare lokala uppgifter raderas inte. Behåll din JSON-säkerhetskopia.</p></div></section>
+<section id="ideasPage"><h2>💡 Idébank</h2>
+<h3>🌷 Mina idéer</h3><div id="ideas"></div><p id="idea" class="panel">Välj en liten idé om du vill.</p>
+<div class="panel" id="smartIdeasPanel"><h3>✨ Smarta förslag</h3><p>Välj ett område och något du vill ha hjälp med. Förslagen fungerar även utan internet.</p>
+<label for="smartCategory">Vad vill du ha hjälp med?</label>
+<select id="smartCategory" style="display:block;width:100%;max-width:420px;padding:10px;margin:8px 0 12px;border-radius:9px"><option value="home">🏠 Hem och vardag</option><option value="planning">📅 Planering</option><option value="energy">🌿 Energi och ork</option><option value="language">📖 Språk och förståelse</option></select>
+<div id="smartOptions" class="actions" aria-label="Välj ett förslag"></div>
+<div id="smartResult" class="panel" role="status" aria-live="polite">Välj ett förslag ovan för att få små, konkreta steg.</div><div id="ideaBackControls"><button type="button" id="backToIdeas08" class="alt">← Till Idébanken</button><button type="button" id="backToHome08" class="alt">⌂ Till startsidan</button></div></div>
+<div class="panel" id="ownPlan08">
+<h3>📝 Min egen uppgift – gratis</h3>
+<p>Skriv vad du vill göra. Fokuskompisen ger enkla steg utifrån färdiga förslag, utan AI eller internet.</p>
+<label for="ownTask08">Vad behöver du hjälp med?</label>
+<textarea id="ownTask08" rows="2" maxlength="150" placeholder="Till exempel: Jag behöver städa sovrummet"></textarea>
+<label for="ownEnergy08">Hur mycket energi har du?</label>
+<select id="ownEnergy08"><option value="low">Lite energi</option><option value="medium" selected>Lagom energi</option><option value="high">Mycket energi</option></select>
+<div class="actions"><button type="button" id="makeOwnPlan08">Skapa min plan</button></div>
+<div id="ownPlanResult08" class="panel" role="status" aria-live="polite" hidden></div>
+<div class="actions"><button type="button" id="saveOwnPlan08" class="alt" hidden>Spara bland Mina uppgifter</button></div>
+<p class="small">Du bestämmer själv vad som är viktigast. Förslag kan vara generella och är inte AI-svar.</p>
+</div>
+<div class="panel" id="premiumIdeas08"><h3>💜 Fokuskompisen AI Premium – kommer senare</h3><p>Planerad AI-chatt med valbar personlighet, svarslängd och frivilligt minne. Målpris 29 kr/månad, om kostnaderna tillåter.</p><p>Ingen betalning eller AI-anslutning finns i denna testversion.</p></div>
+</section>
+<section id="settingsPage">
+  <h2>⚙️ Inställningar</h2>
+    <h3>🏠 Anpassa min startsida</h3>
+<p>Välj vad du vill se på din startsida:</p>
+
+<label>
+  <input type="checkbox" id="showHomeTasks" checked>
+  ✅ Dagens uppgifter
+</label>
+
+<label>
+  <input type="checkbox" id="showHomeSchedule" checked>
+  📅 Mitt dagsschema
+</label>
+
+<label>
+  <input type="checkbox" id="showHomeReminders" checked>
+  🔔 Mina påminnelser
+</label>
+
+  <p>Här kommer du att kunna anpassa Fokuskompisen efter dina behov.</p>
+    <div class="panel" id="visual09SettingsPanel"><h3>🖼️ Bildstöd</h3><label id="visual09SettingLabel" for="visual09Setting"><input id="visual09Setting" type="checkbox" checked> Visa symboler vid uppgifter och rutiner</label><p class="small">Symboler visas även i Hjälp mig komma igång. Du kan stänga av dem när du vill. Inställningen sparas på denna enhet för ditt konto. Ingen AI eller uppkoppling behövs.</p></div>
+    <h3>🎨 Välj färgtema</h3>
+
+<label for="themeSelect">Mitt färgtema:</label>
+<select id="themeSelect">
+  <option value="lavender">💜 Lugn lavendel</option>
+  <option value="blue">💙 Mjuk blå</option>
+  <option value="green">💚 Naturgrön</option>
+  <option value="dark">🌙 Mörkt läge</option>
+</select>
+
+<h3>🔔 Påminnelseljud</h3>
+
+<label>
+  <input type="checkbox" id="reminderSoundEnabled" checked>
+  Spela ljud vid påminnelser
+</label>
+
+<p>
+  <label for="reminderVolume">🔊 Ljudstyrka</label>
+  <input type="range" id="reminderVolume"
+         min="0" max="100" step="10" value="50">
+  <span id="reminderVolumeValue">50 %</span>
+</p>
+
+</section><section id="aiPage" hidden aria-label="AI-kompisen demo">
+<h2>💜 AI-kompisen</h2>
+<p class="notice"><strong>Testversion:</strong> Detta är en enkel chattdemo med förberedda svar, inte riktig AI. Skriv inte känsliga personuppgifter här. Ingen chatt sparas.</p>
+<label for="aiTone">Hur vill du att kompisen ska svara?</label>
+<select id="aiTone"><option value="warm">Varm och omtänksam</option><option value="clear">Tydlig och konkret</option><option value="peppy">Peppande</option></select>
+<label for="aiLength">Svarslängd</label>
+<select id="aiLength"><option value="medium">Lagom</option><option value="short">Kort</option><option value="long">Utförligt</option></select>
+<div id="aiMessages" class="panel" role="log" aria-live="polite" aria-label="Chattmeddelanden" style="min-height:120px;max-height:350px;overflow-y:auto"></div>
+<label for="aiInput">Ditt meddelande</label>
+<textarea id="aiInput" maxlength="600" placeholder="Till exempel: Jag behöver hjälp att komma igång med städningen"></textarea>
+<div class="actions"><button type="button" id="aiSend">Skicka</button><button type="button" class="alt" id="aiClear">Rensa chatten</button></div>
+<p class="small">Den här demon fungerar utan internet. Riktig AI kräver senare en säker serveranslutning och tydligt samtycke för eventuellt minne.</p>
+</section><section id="helpPage" hidden aria-labelledby="helpHeading" class="help10">
+<h2 id="helpHeading">❓ Hjälp och information</h2>
+<p>Här hittar du svar i din egen takt. Tryck på en fråga för att läsa mer.</p>
+<h3>🌱 Kom igång</h3>
+<details><summary>Hur lägger jag till en uppgift?</summary><p>Öppna menyn och välj <strong>Ny uppgift</strong>. Skriv vad du vill göra och spara. Under <strong>Mina uppgifter</strong> kan du se och redigera den.</p></details>
+<details><summary>Hur får jag hjälp med små steg?</summary><p>Välj <strong>Hjälp mig komma igång</strong> eller <strong>Små steg</strong> i menyn. Du kan ta en sak i taget och pausa när du behöver.</p></details>
+<details><summary>Hur planerar jag min dag?</summary><p>Öppna <strong>Min dag</strong> eller <strong>Mitt dagsschema</strong>. Välj det som passar dig och din energinivå.</p></details>
+<h3>🌅 Rutiner och påminnelser</h3>
+<details><summary>Hur skapar jag en rutin?</summary><p>Öppna <strong>Mina rutiner</strong> och skapa en morgon- eller kvällsrutin med egna steg.</p></details>
+<details><summary>Hur fungerar påminnelser?</summary><p>Öppna <strong>Mina påminnelser</strong>. Påminnelser i appen kan kräva att appen är öppen; räkna inte med att en stängd webbläsare alltid ger en avisering.</p></details>
+<h3>📴 Offline och säkerhetskopiering</h3>
+<details><summary>Kan jag använda Fokuskompisen utan internet?</summary><p>Appen kan öppnas offline efter att den har laddats in tidigare. I våra tester har sparade uppgifter och rutiner gått att läsa och redigera offline, och ändringar har synkroniserats efter återanslutning. Vissa funktioner, som inloggning på en ny enhet, kräver internet.</p></details>
+<details><summary>Hur laddar jag ner en säkerhetskopia?</summary><p>Välj <strong>Säkerhetskopia</strong> i menyn och klicka på <strong>Ladda ner säkerhetskopia</strong>. Förvara JSON-filen säkert: den kan innehålla personliga uppgifter.</p></details>
+<details><summary>Vad händer om jag importerar en säkerhetskopia?</summary><p>Import kan ersätta uppgifter och rutiner på det inloggade kontot. Läs bekräftelsen noga och spara gärna en aktuell säkerhetskopia först.</p></details>
+<h3>🔐 Konto och integritet</h3>
+<details><summary>Var sparas mina uppgifter?</summary><p>Fokuskompisen använder lokal lagring i webbläsaren för offlinearbete och Supabase för synkronisering när du är inloggad. Delade enheter kan behålla lokal information; logga ut och skydda enheten.</p></details>
+<details><summary>Hur skyddar jag mitt konto?</summary><p>Använd ett unikt lösenord, dela det inte med andra och logga ut på delade enheter. Spara inte känsliga uppgifter i testfunktioner.</p></details>
+<details><summary>Var finns integritetspolicyn?</summary><p>En fullständig integritetspolicy och kontaktväg behöver publiceras innan Fokuskompisen lanseras för allmänheten. Den här hjälpsidan ersätter inte en integritetspolicy.</p></details>
+<h3>💜 Mer hjälp</h3>
+<p><button type="button" id="helpOpenWelcome10">Visa välkomstguiden igen</button></p>
+<p class="small">Kontakt och feedback: en officiell kontaktväg läggs till inför lanseringen.</p>
+</section></main><footer>Fokuskompisen 1.0 DESIGNTEST 💜 · Sparar lokalt på enheten · Säkerhetskopiera regelbundet · Fungerar utan internet</footer>
+<script> const menuButton = document.getElementById("menuButton");
+const mainMenu = document.getElementById("mainMenu");
+const pages = {
+  home: "homePage",
+  focus11: "focus11Page",
+  calm14: "calm14Page",
+  schedule: "schedule",
+  daily: "dailyPage",
+  tasks: "tasksPage",
+  addTask: "addTaskPage",
+  week: "weekPage",
+  steps: "stepsPage",
+  kickoff: "kickoffPage",
+  pause: "pausePage",
+  ideas: "ideasPage",
+  progress: "progressPage",
+  wins13: "wins13Page",
+  routines: "routinesPage",
+  reminders: "remindersPage",
+    backup: "backupPage",
+  ai: "aiPage",
+  settings: "settingsPage",
+  help: "helpPage"
+};
+  // 0.8: behåll navigeringen när webbläsaren växlar flik eller auth förnyas.
+  const NAV_KEY_08 = "fokuskompisen08navigation";
+  let currentPage08 = "home";
+  function readNav08() {
+    try { return JSON.parse(sessionStorage.getItem(NAV_KEY_08) || "null") || {}; }
+    catch (_) { return {}; }
+  }
+  function rememberNav08(patch) {
+    try { sessionStorage.setItem(NAV_KEY_08, JSON.stringify({...readNav08(), ...patch})); }
+    catch (_) { /* navigeringen fungerar ändå */ }
+  }
+  function showPage(page) {
+  if (!Object.hasOwn(pages,page)) page = "home";
+  currentPage08 = page;
+  if(page === "focus11") renderFocus11();
+  if(page === "wins13") renderWins13();
+  if(typeof visual09Sync==="function")visual09Sync();
+  rememberNav08({page});
+  Object.values(pages).forEach(id => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.hidden = id !== pages[page];
+    }
+  });
+} 
+    mainMenu.querySelectorAll("button[data-page]").forEach(button => {
+  button.addEventListener("click", () => {
+    showPage(button.dataset.page);
+    mainMenu.hidden = true;
+    menuButton.setAttribute("aria-expanded", "false");
+  });
+});
+document.getElementById("helpOpenWelcome10").addEventListener("click", () => {
+  document.getElementById("welcomeGuideOpen").click();
+});
+menuButton.addEventListener("click", () => {
+  if (headerActions.hidden) return;
+  mainMenu.hidden = !mainMenu.hidden;
+  menuButton.setAttribute("aria-expanded", String(!mainMenu.hidden));
+}); 
+  // Dölj sidorna vid start utan att skriva över senast sparad navigering.
+  Object.values(pages).forEach(id => { const el = document.getElementById(id); if (el) el.hidden = true; });
+const $=id=>document.getElementById(id);
+const KEY="fokuskompisen07test";
+    // Inställningar för personlig startsida
+    // Visa eller dölj startsidans olika delar
+function updateHomeWidgets() {
+  const widgets = {
+    tasks: "homeTasksWidget",
+    schedule: "homeScheduleWidget",
+    reminders: "homeRemindersWidget"
+  };
+
+  Object.entries(widgets).forEach(([name, id]) => {
+    const widget = document.getElementById(id);
+    const checkbox = document.getElementById(
+      "showHome" + name.charAt(0).toUpperCase() + name.slice(1)
+    );
+
+    if (widget && checkbox) {
+      widget.hidden = !checkbox.checked;
+    }
+  });
+}
+const HOME_SETTINGS_KEY = "fokuskompisen07home";
+
+const homeOptions = {
+  tasks: document.getElementById("showHomeTasks"),
+  schedule: document.getElementById("showHomeSchedule"),
+  reminders: document.getElementById("showHomeReminders")
+};
+
+updateHomeWidgets();
+    const savedHomeSettings = JSON.parse(
+  localStorage.getItem(HOME_SETTINGS_KEY) || "{}"
+);
+
+Object.entries(homeOptions).forEach(([name, checkbox]) => {
+  checkbox.checked = savedHomeSettings[name] !== false;
+
+  checkbox.addEventListener("change", () => {
+    const settings = {};
+
+    Object.entries(homeOptions).forEach(([key, option]) => {
+      settings[key] = option.checked;
+    });
+
+    localStorage.setItem(
+      HOME_SETTINGS_KEY,
+      JSON.stringify(settings)
+    );
+  });
+    updateHomeWidgets();
+});
+    // Färgteman för Fokuskompisen 0.7
+const themeSelect = document.getElementById("themeSelect");
+const savedTheme = localStorage.getItem("fokuskompisen07theme") || "lavender";
+
+document.body.dataset.theme = savedTheme;
+themeSelect.value = savedTheme;
+
+themeSelect.addEventListener("change", () => {
+  const selectedTheme = themeSelect.value;
+  document.body.dataset.theme = selectedTheme;
+  localStorage.setItem("fokuskompisen07theme", selectedTheme);
+});
+   
+const soundEnabled = document.getElementById("reminderSoundEnabled");
+const soundVolume = document.getElementById("reminderVolume");
+const soundVolumeValue = document.getElementById("reminderVolumeValue");
+
+const savedSoundEnabled = localStorage.getItem("fokuskompisen07soundEnabled");
+const savedSoundVolume = localStorage.getItem("fokuskompisen07soundVolume");
+
+soundEnabled.checked = savedSoundEnabled !== "false";
+soundVolume.value = savedSoundVolume === null ? "50" : savedSoundVolume;
+soundVolumeValue.textContent = soundVolume.value + " %";
+soundVolume.disabled = !soundEnabled.checked;
+
+soundEnabled.addEventListener("change", () => {
+  localStorage.setItem("fokuskompisen07soundEnabled", String(soundEnabled.checked));
+  soundVolume.disabled = !soundEnabled.checked;
+});
+
+soundVolume.addEventListener("input", () => {
+  soundVolumeValue.textContent = soundVolume.value + " %";
+  localStorage.setItem("fokuskompisen07soundVolume", soundVolume.value);
+});
+
+    // Isolerad testlagring, rör inte version 0.6
+const EMPTY={name:"",feeling:"",energy:"",tasks:[],routines:[],moodHistory12:[]};
+let state=JSON.parse(JSON.stringify(EMPTY));
+// Fokuskompisen 1.1 – isolerat fokusläge. Inga nya lagringsnycklar eller databastabeller.
+let focus11Started=false;
+function renderFocus11(){
+ const select=document.getElementById("focus11Choose");
+ if(!select)return;
+ const selected=select.value;
+ select.replaceChildren(new Option("Välj en uppgift", ""));
+ for(const task of state.tasks.filter(t=>!t.done))select.add(new Option(task.name,String(task.id)));
+ if(state.tasks.some(t=>!t.done&&String(t.id)===selected))select.value=selected;
+ const task=state.tasks.find(t=>!t.done&&String(t.id)===select.value);
+ document.getElementById("focus11Current").textContent=task?task.name:"Välj en uppgift för att börja.";
+ document.getElementById("focus11Status").textContent=task?(focus11Started?"Du har börjat. En sak i taget. 💜":"Du kan börja när du vill."):"";
+ for(const id of ["focus11Start","focus11Pause","focus11Done"])document.getElementById(id).disabled=!task;
+}
+document.getElementById("focus11Choose").addEventListener("change",()=>{focus11Started=false;renderFocus11();});
+document.getElementById("focus11Start").addEventListener("click",()=>{focus11Started=true;renderFocus11();});
+document.getElementById("focus11Pause").addEventListener("click",()=>{focus11Started=false;renderFocus11();document.getElementById("focus11Status").textContent="Ta den paus du behöver. Uppgiften finns kvar. ☕";});
+document.getElementById("focus11Done").addEventListener("click",()=>{
+ const select=document.getElementById("focus11Choose");const task=state.tasks.find(t=>!t.done&&String(t.id)===select.value);
+ if(!task)return;
+ const previous=task.done,previousDate=task.completedOn09;
+ task.done=true;task.completedOn09=dateKey();
+ if(!save()){task.done=previous;task.completedOn09=previousDate;document.getElementById("focus11Status").textContent="Det gick inte att spara. Försök igen senare.";return;}
+ focus11Started=false;render();renderFocus11();
+ document.getElementById("focus11Status").textContent="Bra jobbat! Uppgiften är markerad som klar. 💜";
+});
+
+let storageOk=true;
+try{
+  const old=JSON.parse(localStorage.getItem(KEY)||"null");
+  if(old && typeof old==="object" && Array.isArray(old.tasks)) state={...EMPTY,...old};
+}catch(e){storageOk=false}
+// Kontobunden lagring. Den äldre 0.7-nyckeln lämnas orörd.
+let activeUserId = null;
+let syncReady = false;
+let syncBusy = false;
+let syncTimer = null;
+let accountGeneration = 0;
+const accountKey = id => "fokuskompisen07account_" + id;
+const pendingKey = id => "fokuskompisen07pending_" + id;
+const syncMessage = message => { const el = $("syncStatus"); if (el) el.textContent = message; };
+const safeState = value => value && typeof value === "object" && Array.isArray(value.tasks)
+  ? {...EMPTY, ...value} : JSON.parse(JSON.stringify(EMPTY));
+function drawAccountState() {
+  $("name").value = state.name || "";
+  $("feeling").value = state.feeling || "";
+  greeting(); energy(); render(); renderRoutines09(); visual09Sync();
+}
+function queueSync() {
+  if (!activeUserId || !syncReady) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => { void flushSync(); }, 900);
+}
+const save=()=>{
+  try {
+    if (!activeUserId || !syncReady) {
+      $("status").textContent = "Vänta tills dina kontouppgifter har laddats.";
+      return false;
+    }
+    localStorage.setItem(accountKey(activeUserId), JSON.stringify(state));
+    localStorage.setItem(pendingKey(activeUserId), "1");
+    storageOk = true;
+    syncMessage("Sparat på enheten. Synkroniserar när internet finns…");
+    queueSync();
+    return true;
+  } catch(e) {
+    storageOk=false;
+    $("status").textContent="Kunde inte spara lokalt. Exportera gärna en säkerhetskopia.";
+    return false;
+  }
+};
+async function flushSync() {
+  if (!activeUserId || !syncReady || syncBusy || !navigator.onLine) return;
+  const id = activeUserId;
+  if (localStorage.getItem(pendingKey(id)) !== "1") return;
+  syncBusy = true;
+  try {
+    const snapshot = localStorage.getItem(accountKey(id));
+    if (!snapshot) return;
+    const {error} = await fokusSupabase.from("user_tasks").upsert({
+      id, user_id:id, task_data:JSON.parse(snapshot), updated_at:new Date().toISOString()
+    }, {onConflict:"id"});
+    if (error) throw error;
+    // Rensa inte väntande ändringar som gjorts medan uppladdningen pågick.
+    if (activeUserId === id && localStorage.getItem(accountKey(id)) === snapshot) {
+      localStorage.removeItem(pendingKey(id));
+      syncMessage("☁️ Dina uppgifter är sparade på kontot.");
+    } else if (activeUserId === id) queueSync();
+  } catch(e) {
+    if (activeUserId === id) syncMessage("Ändringarna finns kvar på enheten. Kunde inte synkronisera ännu.");
+  } finally { syncBusy=false; }
+}
+async function loadAccount(session) {
+  const id = session?.user?.id;
+  const generation = ++accountGeneration;
+  clearTimeout(syncTimer);
+  syncReady = false;
+  activeUserId = id || null;
+  if (!id) {
+    state = safeState(null);
+    drawAccountState();
+    syncMessage("Logga in för att använda kontolagring.");
+    $("migrateTasks").hidden = true;
+    return;
+  }
+  syncMessage("☁️ Hämtar dina uppgifter…");
+  const cache = localStorage.getItem(accountKey(id));
+  const hasPending = localStorage.getItem(pendingKey(id)) === "1";
+  // Visa alltid kontots lokala kopia först, även om webbläsaren felaktigt
+  // rapporterar online under en offline-start.
+  if (cache) {
+    try {
+      state = safeState(JSON.parse(cache));
+      syncReady = true;
+      drawAccountState();
+      syncMessage("Visar sparade kontouppgifter från den här enheten.");
+    } catch (_) { /* Behåll föregående tillstånd om kopian är skadad. */ }
+  }
+  try {
+    // Vid offline-start: visa senast hämtade kontokopian direkt.
+    // Vänta inte på ett nätverksanrop som kan hänga utan anslutning.
+    if (!navigator.onLine && cache) {
+      state = safeState(JSON.parse(cache));
+      syncReady = true;
+      drawAccountState();
+      syncMessage("Offline: visar senast sparade uppgifter på den här enheten.");
+    } else if (hasPending) {
+      state = safeState(JSON.parse(cache || "null"));
+      syncReady = true;
+      drawAccountState();
+      queueSync();
+    } else {
+      const {data,error} = await fokusSupabase.from("user_tasks")
+        .select("task_data").eq("user_id",id).maybeSingle();
+      if (error) throw error;
+      if (generation !== accountGeneration || activeUserId !== id) return;
+      state = data ? safeState(data.task_data) : safeState(null);
+      localStorage.setItem(accountKey(id),JSON.stringify(state));
+      syncReady = true;
+      drawAccountState();
+      syncMessage(data ? "☁️ Dina uppgifter är hämtade från kontot." : "☁️ Kontot är redo. Inga sparade uppgifter ännu.");
+    }
+  } catch(e) {
+    if (generation !== accountGeneration || activeUserId !== id) return;
+    if (cache) {
+      state = safeState(JSON.parse(cache));
+      syncReady = true;
+      drawAccountState();
+      syncMessage("Offline eller anslutningsfel. Visar uppgifter sparade på den här enheten.");
+    } else {
+      state = safeState(null);
+      drawAccountState();
+      syncMessage("Kunde inte hämta kontouppgifter. Försök igen med internet innan du ändrar något.");
+    }
+  }
+  if (generation === accountGeneration && activeUserId === id) {
+    const legacy = safeState(JSON.parse(localStorage.getItem(KEY) || "null"));
+    $("migrateTasks").hidden = legacy.tasks.length === 0;
+  }
+}
+$("migrateTasks").addEventListener("click", () => {
+  if (!activeUserId || !syncReady) return;
+  const legacy = safeState(JSON.parse(localStorage.getItem(KEY) || "null"));
+  if (!legacy.tasks.length) return;
+  if (!confirm("Kopiera dina tidigare lokala uppgifter till detta konto? Nuvarande kontouppgifter behålls. En säkerhetskopia rekommenderas.")) return;
+  const ids = new Set(state.tasks.map(t=>String(t.id)));
+  const additions = legacy.tasks.filter(t=>!ids.has(String(t.id)));
+  state.tasks.push(...additions);
+  if (!state.name) state.name = legacy.name;
+  if (!state.feeling) state.feeling = legacy.feeling;
+  if (!state.energy) state.energy = legacy.energy;
+  if (save()) { drawAccountState(); syncMessage("Tidigare uppgifter kopierade. Synkroniserar…"); $("migrateTasks").hidden=true; }
+});
+window.addEventListener("online", () => { void flushSync(); });
+window.addEventListener("focus", async () => {
+  if (!activeUserId || !syncReady) return;
+  if (localStorage.getItem(pendingKey(activeUserId)) === "1") { void flushSync(); return; }
+  const id = activeUserId;
+  try {
+    const {data,error} = await fokusSupabase.from("user_tasks").select("task_data").eq("user_id",id).maybeSingle();
+    if (!error && data && activeUserId === id && localStorage.getItem(pendingKey(id)) !== "1") {
+      state = safeState(data.task_data);
+      localStorage.setItem(accountKey(id),JSON.stringify(state));
+      drawAccountState();
+      syncMessage("☁️ Dina uppgifter är uppdaterade.");
+    }
+  } catch(e) { /* Lokal kopia behålls. */ }
+});
+const dateKey=(d=new Date())=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const priorities={today:"Måste göras idag",soon:"Bra om det blir gjort",later:"Kan vänta"};
+const repeats={none:"Upprepas inte",daily:"Varje dag",weekly:"Varje vecka"};
+const addDays=(key,n)=>{let d=new Date(key+"T12:00:00");d.setDate(d.getDate()+n);return dateKey(d)};
+function dueOn(t,key){
+  if(t.done || !t.date)return false;
+  if(t.date>key)return false;
+  if(t.repeat==="daily")return true;
+  if(t.repeat==="weekly"){
+    const a=new Date(t.date+"T12:00:00"),b=new Date(key+"T12:00:00");
+    return Math.round((b-a)/86400000)%7===0;
+  }
+  return t.date===key;
+}
+function question(s){
+  if(/handla|mat|middag/i.test(s))return "Har du tillräckligt med mat hemma för idag?";
+  if(/tvätt|kläder/i.test(s))return "Har du tillräckligt med rena kläder just nu?";
+  if(/faktura|räkning|betala/i.test(s))return "Är betalningen eller förfallodatumet idag eller snart?";
+  if(/läkare|möte|besök|tid/i.test(s))return "Finns det en bokad tid eller en deadline?";
+  if(/städa|disk|dammsug/i.test(s))return "Behöver detta göras idag för att hemmet ska fungera?";
+  return "Vad skulle göra den här uppgiften lättare att börja med?";
+}
+function smallSteps(s){
+  if(/handla|mat/i.test(s))return ["Kolla vad som finns hemma","Skriv en kort inköpslista","Bestäm när du kan handla","Handla det viktigaste först"];
+  if(/tvätt|kläder/i.test(s))return ["Samla ihop tvätten","Sortera det viktigaste","Starta en maskin","Ta hand om tvätten när den är klar"];
+  if(/städa|disk|dammsug/i.test(s))return ["Välj en liten yta","Börja med en enda sak","Ta paus när du behöver","Bestäm själv när det räcker"];
+  if(/ringa|samtal/i.test(s))return ["Skriv ner vad du vill säga","Ta fram numret","Ring när du känner dig redo","Du behöver inte säga allt perfekt"];
+  return ["Ta fram det du behöver","Gör den minsta första delen","Ta en paus om du behöver","Välj om du vill fortsätta"];
+}
+function greeting(){let h=new Date().getHours();$("hello").textContent=(h<11?"God morgon":h<18?"Hej":"God kväll")+(state.name?", "+state.name:"")+"! 💜"}
+function energy(){
+  document.querySelectorAll("[data-energy]").forEach(b=>b.classList.toggle("selected",b.dataset.energy===state.energy));
+  renderMood12();
+  $("message").textContent=state.energy==="low"?"Vid låg energi kan du välja en enda liten sak, eller vila.":state.energy==="medium"?"Välj det som känns rimligt för dig.":state.energy==="high"?"Du har energi just nu – planera gärna in en paus också.":"Du behöver inte göra allt idag.";
+}
+// Fokuskompisen 1.2: frivillig energihistorik, sparas i användarens befintliga kontodata.
+function mood12Date(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");}
+function mood12Entries(){return Array.isArray(state.moodHistory12)?state.moodHistory12.filter(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&["low","medium","high"].includes(e.energy)).slice(-30):[];}
+function renderMood12(){
+ const host=document.getElementById("mood12History");if(!host)return;
+ host.replaceChildren();const entries=mood12Entries().filter(e=>e.date<=mood12Date()).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7);
+ if(!entries.length){const p=document.createElement("p");p.textContent="Ingen energihistorik sparad ännu.";host.append(p);return;}
+ const names={low:"🪫 Låg",medium:"🔋 Lagom",high:"⚡ Hög"};
+ for(const entry of entries){const row=document.createElement("div");row.style.cssText="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:9px 0";
+ const label=document.createElement("span");label.textContent=entry.date+" – "+names[entry.energy];
+ const remove=document.createElement("button");remove.type="button";remove.textContent="Radera";remove.setAttribute("aria-label","Radera energin för "+entry.date);
+ remove.onclick=()=>{if(!confirm("Radera energin för "+entry.date+"?"))return;const prev=state.moodHistory12;state.moodHistory12=mood12Entries().filter(e=>e.date!==entry.date);if(!save()){state.moodHistory12=prev;document.getElementById("mood12Notice").textContent="Det gick inte att spara raderingen.";return;}document.getElementById("mood12Notice").textContent="Dagen har raderats.";renderMood12();};
+ row.append(label,remove);host.append(row);}
+}
+document.getElementById("mood12Save").onclick=()=>{
+ if(!["low","medium","high"].includes(state.energy)){document.getElementById("mood12Notice").textContent="Välj först låg, lagom eller hög energi.";return;}
+ const prev=state.moodHistory12;const today=mood12Date();state.moodHistory12=[...mood12Entries().filter(e=>e.date!==today),{date:today,energy:state.energy}].sort((a,b)=>a.date.localeCompare(b.date)).slice(-30);
+ if(!save()){state.moodHistory12=prev;document.getElementById("mood12Notice").textContent="Det gick inte att spara. Försök igen.";return;}
+ document.getElementById("mood12Notice").textContent="Dagens energi är sparad. 💜";renderMood12();
+};
+// Behåll öppna stegpaneler när uppgifterna ritas om.
+const expandedTaskSteps08 = new Set();
+// Endast visningsinställningar: hålls separat från uppgifter och molnsynk.
+const TASK_GROUPS_STORAGE_KEY08 = "fokuskompisen08collapsedTaskGroups";
+const TASK_GROUP_IDS08 = ["today", "soon", "later", "done"];
+function readCollapsedTaskGroups08() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(TASK_GROUPS_STORAGE_KEY08) || "[]");
+    return new Set(Array.isArray(saved) ? saved.filter(id => TASK_GROUP_IDS08.includes(id)) : []);
+  } catch (_) { return new Set(); }
+}
+const collapsedTaskGroups08 = readCollapsedTaskGroups08();
+function saveCollapsedTaskGroups08() {
+  try {
+    localStorage.setItem(TASK_GROUPS_STORAGE_KEY08, JSON.stringify([...collapsedTaskGroups08]));
+  } catch (_) { /* Grupperna går fortfarande att öppna och stänga. */ }
+}
+function openTaskSteps08(taskId) {
+  showPage("steps");
+  const chooser = $("choose");
+  chooser.value = String(taskId);
+  renderSteps();
+  window.scrollTo(0, 0);
+}
+// 0.9: Avklarade uppgifter, helt baserat på kontots befintliga state.
+// Datum registreras först vid nya avbockningar; äldre data ges inte påhittade datum.
+// Bildstöd 0.9 – endast visning. Ändrar inte state, uppgifter eller rutiner.
+const visual09StoragePrefix="fokuskompisen09-visual-prefs:";
+function visual09Key(){return visual09StoragePrefix+String(activeUserId||"guest");}
+function visual09Enabled(){try{return localStorage.getItem(visual09Key())!=="off";}catch(_){return true;}}
+function visual09Sync(){const input=document.getElementById("visual09Setting");if(input)input.checked=visual09Enabled();document.querySelectorAll(".visual09").forEach(icon=>{icon.hidden=!visual09Enabled();});}
+function visual09Symbol(text){
+ const s=String(text||"").toLocaleLowerCase("sv-SE");
+ const patterns=[
+  [/borsta.*tänd|tandborst|tänder/,"🪥"],
+  [/bädda|säng|sovrum|lägga sig|vakna/,"🛏️"],
+  [/disk|tallrik|kopp|bestick/,"🍽️"],
+  [/tvätt|kläder|tvättmaskin|strumpor/,"👕"],
+  [/städ|plocka undan|plocka upp|dammsug|golv|städa/,"🧹"],
+  [/sopor|skräp|släng/,"🗑️"],
+  [/handla|köp|affär|butik|matinköp/,"🛒"],
+  [/laga mat|frukost|lunch|middag|äta|måltid/,"🥣"],
+  [/dricka|vatten|glas/,"🥤"],
+  [/dusch|bada|tvätta händer|hygien/,"🚿"],
+  [/medicin|tablett/,"💊"],
+  [/promenad|gå ut|utomhus|motion/,"🚶"],
+  [/skola|läxa|plugga|läsa|bok/,"📖"],
+  [/skriv|mejl|brev|meddelande/,"✏️"],
+  [/ringa|telefon|samtal/,"📞"],
+  [/jobb|arbete|möte/,"💼"],
+  [/vila|paus|andas|återhämt/,"☕"],
+  [/sortera|ordna|organisera/,"📦"]
+ ];
+ const found=patterns.find(([re])=>re.test(s));
+ return found?found[1]:"🌱";
+}
+function visual09Decorate(target,text){
+ if(!target || target.querySelector(":scope > .visual09"))return;
+ const icon=document.createElement("span");icon.className="visual09";
+ icon.setAttribute("aria-hidden","true");icon.textContent=visual09Symbol(text);
+ icon.hidden=!visual09Enabled();target.prepend(icon);
+}
+document.getElementById("visual09Setting").addEventListener("change",event=>{
+ try{localStorage.setItem(visual09Key(),event.target.checked?"on":"off");}
+ catch(_){ /* inställningen fungerar tills sidan stängs */ }
+ visual09Sync();
+});
+
+function renderProgress09(){
+ const todayEl=$("progressToday"),weekEl=$("progressWeek"),daysEl=$("progressDays"),itemsEl=$("progressItems");
+ if(!todayEl||!weekEl||!daysEl||!itemsEl)return;
+ const now=new Date();now.setHours(12,0,0,0);
+ const today=dateKey();
+ const monday=new Date(now);monday.setDate(now.getDate()-((now.getDay()+6)%7));
+ const keyOf=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
+ const start=keyOf(monday);
+ const completed=state.tasks.filter(t=>t.done);
+ const dated=completed.filter(t=>/^\d{4}-\d{2}-\d{2}$/.test(t.completedOn09||""));
+ const todays=dated.filter(t=>t.completedOn09===today);
+ const weekly=dated.filter(t=>t.completedOn09>=start&&t.completedOn09<=today);
+ todayEl.textContent=todays.length ? `Du har klarat ${todays.length} ${todays.length===1?"uppgift":"uppgifter"} idag. Varje litet steg räknas. 💜` : "Inga avklarade uppgifter registrerade idag. Det är helt okej att vila. 💜";
+ weekEl.textContent=weekly.length ? `${weekly.length} ${weekly.length===1?"uppgift":"uppgifter"} registrerade den här veckan.` : "Inga avklarade uppgifter registrerade den här veckan ännu.";
+ daysEl.replaceChildren();
+ const weekdays=["Mån","Tis","Ons","Tor","Fre","Lör","Sön"];
+ for(let i=0;i<7;i++){
+  const d=new Date(monday);d.setDate(monday.getDate()+i);const k=keyOf(d);
+  const count=dated.filter(t=>t.completedOn09===k).length;
+  const el=document.createElement("div");el.className="panel";
+  const strong=document.createElement("strong");strong.textContent=weekdays[i];
+  const value=document.createElement("p");value.textContent=k>today?"Kommande":count?`${count} klara`:"Ingen registrering";
+  el.append(strong,value);daysEl.append(el);
+ }
+ itemsEl.replaceChildren();
+ if(!completed.length){const p=document.createElement("p");p.textContent="Inga avklarade uppgifter just nu.";itemsEl.append(p);return;}
+ const sorted=[...completed].sort((a,b)=>(b.completedOn09||"").localeCompare(a.completedOn09||""));
+ for(const t of sorted){const p=document.createElement("p");p.className="panel";p.textContent="✓ "+t.name+(t.completedOn09?" · "+t.completedOn09:" · Avklarad tidigare (datum saknas)");itemsEl.append(p);}
+}
+function render(){
+    renderProgress09();
+    updateHomeTasks();
+updateHomeReminders();
+  const box=$("tasks");box.innerHTML="";box.classList.add("task-columns08");
+  if(!state.tasks.length)box.innerHTML='<p class="panel">Inga uppgifter ännu.</p>';
+  const taskGroups=[...Object.entries(priorities),["done","Avklarade uppgifter"]];
+  taskGroups.forEach(([priority,label])=>{
+    const items=state.tasks.filter(t=>priority==="done"?!!t.done:!t.done&&t.priority===priority);
+    const group=document.createElement("details");
+    group.className="panel task-priority-group08";
+    group.open=!collapsedTaskGroups08.has(priority);
+    const heading=document.createElement("summary");
+    heading.textContent=label+" ("+items.length+")";
+    // Klick/Enter/blanksteg på summary ändrar details automatiskt.
+    // Spara först vid användarens handling, inte vid renderingsutlösta toggle-event.
+    heading.addEventListener("click", () => {
+      if (group.open) collapsedTaskGroups08.add(priority);
+      else collapsedTaskGroups08.delete(priority);
+      saveCollapsedTaskGroups08();
+    });
+    heading.style.cssText="font-weight:700;cursor:pointer;padding:6px 0;";
+    group.append(heading);
+    const groupContent=document.createElement("div");
+    groupContent.className="task-group-content08";
+    group.append(groupContent);
+    box.append(group);
+    if(!items.length){const empty=document.createElement("p");empty.className="small";empty.textContent="Inga uppgifter här just nu.";groupContent.append(empty);}
+    items.forEach(t=>{
+    const div=document.createElement("div");div.className="panel"+(t.done?" done":"");
+    div.innerHTML='<strong>'+esc(t.name)+'</strong><p class="small">'+esc(question(t.name))+'</p><div class="flex"><div><label>Prioritet</label><select class="p">'+Object.entries(priorities).map(([k,v])=>'<option value="'+k+'" '+(t.priority===k?"selected":"")+'>'+v+'</option>').join("")+'</select></div><div><label>Datum</label><input class="d" type="date" value="'+esc(t.date||"")+'"></div><div><label>Upprepning</label><select class="r">'+Object.entries(repeats).map(([k,v])=>'<option value="'+k+'" '+((t.repeat||"none")===k?"selected":"")+'>'+v+'</option>').join("")+'</select></div><div><label>Påminnelse i appen</label><input class="time" type="time" value="'+esc(t.remind||"")+'"></div></div><div class="actions"><button class="alt donebtn">'+(t.done?"Ångra klar":"Markera klar")+'</button><button class="alt editbtn">✏️ Redigera</button><button class="alt del">Ta bort</button></div>';
+        visual09Decorate(div.querySelector("strong"),t.name);
+        div.querySelector(".editbtn").onclick=()=>{
+      const nyttNamn=prompt("Ändra uppgiftens namn:",t.name);
+      if(nyttNamn===null)return;
+      const namn=nyttNamn.trim();
+      if(!namn){alert("Uppgiftens namn får inte vara tomt.");return;}
+      if(namn.length>150){alert("Namnet får vara högst 150 tecken.");return;}
+      const gammaltNamn=t.name;
+      t.name=namn;
+      if(!save()){t.name=gammaltNamn;alert("Det gick inte att spara ändringen.");return;}
+      render();
+    };
+    div.querySelector(".p").onchange=e=>{t.priority=e.target.value;save();render()};
+    div.querySelector(".d").onchange=e=>{t.date=e.target.value;save();render()};
+    div.querySelector(".r").onchange=e=>{t.repeat=e.target.value;if(t.repeat!=="none"&&!t.date)t.date=dateKey();save();render()};
+    div.querySelector(".time").onchange=e=>{t.remind=e.target.value;save();render()};
+    div.querySelector(".donebtn").onclick=()=>{
+      if(t.repeat&&t.repeat!=="none"&&!t.done){
+        const base=t.date||dateKey(),next=t.repeat==="daily"?addDays(base,1):addDays(base,7);
+        // Förfallna upprepningar flyttas fram till nästa framtida förekomst
+        let d=next;
+        while(d<=dateKey())d=addDays(d,t.repeat==="daily"?1:7);
+        t.date=d;
+        $("status").textContent="Återkommande uppgift flyttad till nästa tillfälle.";
+      }else {
+        t.done=!t.done;
+        if(t.done)t.completedOn09=dateKey();
+        else delete t.completedOn09;
+      }
+      save();render()
+    };
+    div.querySelector(".del").onclick=()=>{if(!confirm("Ta bort uppgiften?"))return;state.tasks=state.tasks.filter(x=>x!==t);save();render()};
+    // Visa samma små steg som på sidan Små steg, utan att skapa nya datafält.
+    const stepsActions=document.createElement("div");
+    stepsActions.className="actions";
+    const toggle=document.createElement("button");
+    toggle.type="button";toggle.className="alt";
+    toggle.textContent=expandedTaskSteps08.has(String(t.id))?"👣 Dölj små steg":"👣 Visa små steg";
+    const open=document.createElement("button");
+    open.type="button";open.className="alt";
+    open.textContent="↗ Öppna Små steg";
+    open.onclick=()=>openTaskSteps08(t.id);
+    stepsActions.append(toggle,open);
+    div.append(stepsActions);
+    const stepPanel=document.createElement("div");
+    stepPanel.className="panel";
+    stepPanel.hidden=!expandedTaskSteps08.has(String(t.id));
+    const drawInlineSteps=()=>{
+      stepPanel.replaceChildren();
+      if(!Array.isArray(t.stepsDone))t.stepsDone=[];
+      const steps=Array.isArray(t.customSteps)&&t.customSteps.length?t.customSteps:smallSteps(t.name);
+      steps.forEach((step,i)=>{
+        const label=document.createElement("label");
+        label.style.display="block";label.style.fontWeight="normal";
+        const checkbox=document.createElement("input");
+        checkbox.type="checkbox";checkbox.checked=!!t.stepsDone[i];
+        checkbox.onchange=()=>{t.stepsDone[i]=checkbox.checked;save();};
+        label.append(checkbox,document.createTextNode(" "+step));
+        stepPanel.append(label);
+      });
+    };
+    drawInlineSteps();
+    toggle.onclick=()=>{
+      const id=String(t.id);
+      if(expandedTaskSteps08.has(id))expandedTaskSteps08.delete(id);
+      else expandedTaskSteps08.add(id);
+      stepPanel.hidden=!expandedTaskSteps08.has(id);
+      toggle.textContent=stepPanel.hidden?"👣 Visa små steg":"👣 Dölj små steg";
+    };
+    div.append(stepPanel);
+    groupContent.append(div);
+  });
+  });
+  $("daily").innerHTML="";
+  Object.entries(priorities).forEach(([k,label])=>{
+    const items=state.tasks.filter(t=>!t.done&&t.priority===k&&(!t.date||dueOn(t,dateKey())||(t.repeat==="none"&&t.date<dateKey())));
+    const div=document.createElement("div");div.className="panel";
+    div.innerHTML="<strong>"+label+"</strong>"+(items.length?"<ul>"+items.map(t=>"<li>"+esc(t.name)+"</li>").join("")+"</ul>":"<p>Inget här just nu.</p>");
+    $("daily").append(div)
+  });
+  $("week").innerHTML="";
+  for(let i=0;i<7;i++){
+    const d=new Date();d.setDate(d.getDate()+i);const day=dateKey(d),items=state.tasks.filter(t=>dueOn(t,day));
+    const div=document.createElement("div");div.className="panel";
+    div.innerHTML="<strong>"+(i===0?"Idag":esc(d.toLocaleDateString("sv-SE",{weekday:"long"})))+"</strong><p class='small'>"+esc(d.toLocaleDateString("sv-SE",{day:"numeric",month:"short"}))+"</p>"+(items.length?"<ul>"+items.map(t=>"<li>"+esc(t.name)+"</li>").join("")+"</ul>":"<p class='small'>Inget planerat</p>");
+    $("week").append(div);
+  }
+  const old=$("choose").value;
+  $("choose").innerHTML='<option value="">Välj en uppgift</option>'+state.tasks.filter(t=>!t.done).map(t=>'<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>').join("");
+  if(state.tasks.some(t=>String(t.id)===old&&!t.done)){$("choose").value=old;renderSteps()}else $("steps").textContent="Välj en uppgift för att få hjälp med små steg.";
+  renderReminders();
+}
+function renderSteps(){
+  const t=state.tasks.find(t=>String(t.id)===$("choose").value);
+  $("steps").innerHTML="";
+  if(!t){$("steps").textContent="Välj en uppgift för att få hjälp med små steg.";return}
+  if(!Array.isArray(t.stepsDone))t.stepsDone=[];
+  (Array.isArray(t.customSteps) && t.customSteps.length ? t.customSteps : smallSteps(t.name)).forEach((s,i)=>{
+    const label=document.createElement("label");label.style.fontWeight="normal";
+    const input=document.createElement("input");input.type="checkbox";input.checked=!!t.stepsDone[i];
+    input.onchange=()=>{t.stepsDone[i]=input.checked;save()};
+    label.append(input,document.createTextNode(" "+s));$("steps").append(label)
+  })
+}
+$("choose").onchange=renderSteps;
+$("add").onsubmit=e=>{
+  e.preventDefault();const name=$("task").value.trim();if(!name)return;
+  const repeat=$("repeat").value;
+  state.tasks.push({id:String(Date.now())+Math.random(),name,date:$("date").value||(repeat!=="none"?dateKey():""),priority:$("priority").value,repeat,remind:$("remind").value,done:false,stepsDone:[]});
+  save();$("add").reset();render();alert("✅ Uppgiften har lagts till! 💜");
+};
+$("name").value=state.name||"";$("feeling").value=state.feeling||"";
+$("name").oninput=e=>{state.name=e.target.value;save();greeting()};
+$("feeling").oninput=e=>{state.feeling=e.target.value;save()};
+document.querySelectorAll("[data-energy]").forEach(b=>b.onclick=()=>{state.energy=b.dataset.energy;save();energy()});
+let remaining=1200,timer=null;
+const display=()=>{$("clock").textContent=String(Math.floor(remaining/60)).padStart(2,"0")+":"+String(remaining%60).padStart(2,"0")};
+$("start").onclick=()=>{if(timer)return;if(remaining===0)remaining=1200;$("pause").textContent="Din paus pågår. Ta det lugnt.";timer=setInterval(()=>{remaining--;display();if(remaining<=0){clearInterval(timer);timer=null;$("pause").textContent="Pausen är slut. Du bestämmer när du vill fortsätta."}},1000)};
+$("stop").onclick=()=>{clearInterval(timer);timer=null;remaining=1200;display();$("pause").textContent="Timern är återställd."};
+
+// Idébanken 0.8: helt lokala förslag; påverkar inte uppgifter eller kontosynk.
+const smartIdeas08 = {
+ home: [
+  ["Städa ett rum", ["Välj en liten yta, till exempel ett bord.", "Lägg undan tre saker.", "Ta en paus om du behöver."]],
+  ["Laga mat", ["Bestäm en enkel maträtt.", "Ta fram det du behöver.", "Gör ett moment i taget."]],
+  ["Tvätt", ["Samla ihop lite tvätt.", "Sortera det som behöver tvättas.", "Starta en maskin om du orkar."]]
+ ],
+ planning: [
+  ["Planera min dag", ["Välj det viktigaste för idag.", "Lägg till en sak som vore bra att hinna.", "Planera in en paus."]],
+  ["Stor uppgift", ["Skriv ner vad du vill få gjort.", "Välj det minsta första steget.", "Gör bara det steget till att börja med."]],
+  ["Förbered morgondagen", ["Titta på morgondagens tider.", "Lägg fram det du behöver.", "Skriv ner en sak att komma ihåg."]]
+ ],
+ energy: [
+  ["Jag har lite energi", ["Välj en sak som tar högst två minuter.", "Gör den om det känns möjligt.", "Vila utan dåligt samvete."]],
+  ["Det känns för mycket", ["Stanna upp en stund.", "Välj en enda sak som är viktig just nu.", "Be om hjälp om du behöver."]],
+  ["Jag behöver en paus", ["Lägg ifrån dig uppgiften en stund.", "Drick vatten eller sitt bekvämt.", "Bestäm själv om och när du vill fortsätta."]]
+ ],
+ language: [
+  ["Förstå en svår text", ["Läs en mening i taget.", "Markera ord du inte förstår.", "Försök skriva meningen med egna ord."]],
+  ["Skriv ett meddelande", ["Skriv vem meddelandet är till.", "Skriv vad du vill berätta eller fråga.", "Läs igenom och skicka när du är nöjd."]],
+  ["Förklara ett ord", ["Skriv ner ordet.", "Leta efter en enkel förklaring i en ordbok.", "Testa ordet i en egen mening."]]
+ ]
+};
+function renderSmartIdeas08() {
+ const category = document.getElementById("smartCategory").value;
+ rememberNav08({category, idea: null});
+ const options = document.getElementById("smartOptions");
+ const result = document.getElementById("smartResult");
+ options.replaceChildren();
+ result.textContent = "Välj ett förslag ovan för att få små, konkreta steg.";
+ for (const [name, steps] of smartIdeas08[category]) {
+  const button = document.createElement("button"); button.type="button"; button.className="alt"; button.textContent=name;
+  button.addEventListener("click", () => {
+   rememberNav08({category, idea: name});
+   result.replaceChildren();
+   const title=document.createElement("strong");title.textContent=name;result.append(title);
+   const list=document.createElement("ol");
+   steps.forEach(step=>{const li=document.createElement("li");li.textContent=step;list.append(li);});
+   result.append(list);
+  });
+  options.append(button);
+ }
+}
+// 0.8: Egen uppgift, lokal regelbaserad hjälp. Ingen extern AI eller API-anrop.
+const ownTask08 = document.getElementById("ownTask08");
+const ownEnergy08 = document.getElementById("ownEnergy08");
+const ownResult08 = document.getElementById("ownPlanResult08");
+const ownSave08 = document.getElementById("saveOwnPlan08");
+let generatedOwnPlan08 = null;
+const ownPlanRules08 = [
+  {pattern:/sovrum|städa|städ|dammsug|plocka undan/i, steps:["Välj en liten del av rummet.","Plocka undan några saker.","Lägg smutstvätten där den hör hemma.","Torka av eller dammsug en liten yta.","Ta en paus och välj om du vill fortsätta."]},
+  {pattern:/disk|köket|köksbänk/i, steps:["Välj en liten del av köket.","Samla ihop disken.","Diska några saker eller fyll diskmaskinen.","Torka av en yta.","Ta en paus när du behöver."]},
+  {pattern:/tvätt|tvätta kläder/i, steps:["Samla ihop det viktigaste som behöver tvättas.","Sortera tvätten.","Lägg i en maskin och starta den.","Ta hand om tvätten när den är klar."]},
+  {pattern:/handla|inköp|köpa mat|mataffär/i, steps:["Kontrollera vad som behövs hemma.","Skriv en kort inköpslista.","Bestäm hur och när du kan handla.","Börja med det viktigaste."]},
+  {pattern:/laga mat|middag|lunch|frukost/i, steps:["Välj en enkel måltid.","Se vilka ingredienser du har.","Ta fram det du behöver.","Gör ett moment i taget."]},
+  {pattern:/ringa|telefonsamtal|samtal/i, steps:["Skriv ner vad du vill fråga eller säga.","Ta fram telefonnummer.","Välj en stund att ringa.","Ring och använd anteckningarna som stöd."]},
+  {pattern:/läxa|plugga|studera|skolarbete|läsa/i, steps:["Välj en liten del av uppgiften.","Ta fram det material du behöver.","Arbeta en kort stund.","Pausa och välj nästa del."]},
+  {pattern:/mejl|mail|meddelande|skriva brev/i, steps:["Bestäm vem du ska skriva till.","Skriv kort vad du vill säga.","Läs igenom texten.","Skicka när du är nöjd."]}
+];
+function makeOwnSteps08(text, energy) {
+  const match = ownPlanRules08.find(rule => rule.pattern.test(text));
+  if (!match) return ["Fundera på vad första lilla delen av uppgiften är.", "Ta fram det du behöver.", "Jobba med en liten del i " + (energy === "low" ? "2" : energy === "medium" ? "5" : "10") + " minuter.", "Ta en paus och bestäm om du vill fortsätta."];
+  const steps = match.steps;
+  if (energy === "low") return [steps[0], steps[1], "Ta en paus. Det är okej att stanna här."];
+  if (energy === "medium") return [...steps.slice(0,3), "Ta en paus och välj om du vill fortsätta."];
+  return steps;
+}
+function showOwnPlan08() {
+  const name = ownTask08.value.trim();
+  generatedOwnPlan08 = null;
+  ownSave08.hidden = true;
+  ownResult08.hidden = false;
+  ownResult08.replaceChildren();
+  if (!name) { ownResult08.textContent = "Skriv först vad du vill göra."; return; }
+  const steps = makeOwnSteps08(name, ownEnergy08.value);
+  generatedOwnPlan08 = {name, steps};
+  const heading = document.createElement("strong"); heading.textContent = "Din plan: " + name;
+  const list = document.createElement("ol");
+  steps.forEach(step => {const li = document.createElement("li"); li.textContent = step; list.append(li);});
+  ownResult08.append(heading, list);
+  ownSave08.hidden = false;
+}
+document.getElementById("makeOwnPlan08").addEventListener("click", showOwnPlan08);
+for (const field of [ownTask08,ownEnergy08]) field.addEventListener("input", () => {generatedOwnPlan08=null;ownSave08.hidden=true;});
+ownSave08.addEventListener("click", () => {
+  if (!generatedOwnPlan08) return;
+  if (!activeUserId) { ownResult08.append(document.createTextNode(" Logga in för att spara uppgiften på ditt konto.")); return; }
+  state.tasks.push({id:String(Date.now())+Math.random(),name:generatedOwnPlan08.name,date:"",priority:"soon",repeat:"none",remind:"",done:false,stepsDone:[],customSteps:[...generatedOwnPlan08.steps]});
+  save(); render();
+  ownSave08.hidden=true;
+  const message=document.createElement("p"); message.textContent="✅ Planen är sparad bland Mina uppgifter. Du kan hitta stegen under Små steg.";
+  ownResult08.append(message);
+});
+
+document.getElementById("backToIdeas08").addEventListener("click", () => {
+  // Stanna på Idébanken och behåll vald kategori, men visa förslagen igen.
+  showPage("ideas");
+  renderSmartIdeas08();
+  document.getElementById("smartIdeasPanel").scrollIntoView({block:"start"});
+});
+document.getElementById("backToHome08").addEventListener("click", () => {showPage("home");window.scrollTo(0,0);});
+document.getElementById("smartCategory").addEventListener("change",renderSmartIdeas08);
+const initialNav08 = readNav08();
+if (smartIdeas08[initialNav08.category]) document.getElementById("smartCategory").value = initialNav08.category;
+renderSmartIdeas08();
+// Återställ förslaget efter att kategorins knappar har skapats.
+if (initialNav08.idea) {
+  const optionButtons = [...document.querySelectorAll("#smartOptions button")];
+  const match = optionButtons.find(b => b.textContent === initialNav08.idea);
+  if (match) match.click();
+}
+
+["Drick ett glas vatten","Öppna fönstret en stund","Plocka undan en sak","Skriv ner en tanke","Vila en stund"].forEach(s=>{let b=document.createElement("button");b.className="alt";b.textContent=s;b.onclick=()=>{$("idea").textContent="Liten idé: "+s+". Du väljer själv."};$("ideas").append(b)});
+
+function playReminderSound() {
+    if (!soundEnabled.checked) return;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    
+const startTime = ctx.currentTime;
+
+function playBeep(delay) {
+  const oscillator = ctx.createOscillator();
+  const volume = ctx.createGain();
+  const start = startTime + delay;
+
+  oscillator.type = "triangle";
+  oscillator.frequency.value = 660;
+
+  volume.gain.setValueAtTime(0.0001, start);
+  volume.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.5 * Number(soundVolume.value) / 100), start + 0.04);
+  volume.gain.exponentialRampToValueAtTime(0.0001, start + 0.35);
+
+  oscillator.connect(volume);
+  volume.connect(ctx.destination);
+
+  oscillator.start(start);
+  oscillator.stop(start + 0.35);
+}
+
+playBeep(0);
+playBeep(0.5);
+
+setTimeout(() => ctx.close(), 1200);
+
+  } catch (error) {
+    console.warn("Påminnelseljud kunde inte spelas", error);
+  }
+}
+const playedReminderSounds = new Set();
+    function renderReminders(){
+  const now=new Date(),current=now.getHours()*60+now.getMinutes(),today=dateKey();
+        const currentMinute = now.getHours() * 60 + now.getMinutes();
+  const items=state.tasks.filter(t=>{
+    if(t.done||!t.remind)return false;
+    const [h,m]=t.remind.split(":").map(Number);
+    return (!t.date || dueOn(t,today)) && h*60+m<=current;
+  });
+        
+items.forEach(t => {
+  const [h, m] = t.remind.split(":").map(Number);
+  const key = today + "-" + t.id + "-" + t.remind;
+
+  if (h * 60 + m === currentMinute && !playedReminderSounds.has(key)) {
+    playedReminderSounds.add(key);
+    playReminderSound();
+  }
+});
+
+  $("reminders").innerHTML=items.length?"<div class='notice'>"+items.map(t=>"<p>🔔 "+esc(t.name)+" – "+esc(t.remind)+"</p>").join("")+"</div>":"<p class='small'>Inga påminnelser just nu.</p>";
+}
+setInterval(renderReminders,60000);
+$("export").onclick=()=>{
+  const backup={app:"Fokuskompisen",version:"0.7",exportedAt:new Date().toISOString(),data:state};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="Fokuskompisen_sakerhetskopia_"+dateKey()+".json";document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  $("status").textContent="Säkerhetskopian har förberetts för nedladdning. Kontrollera att filen sparades.";
+};
+$("import").onchange=async e=>{
+  const file=e.target.files[0];if(!file)return;
+  try{
+    if(file.size>2_000_000)throw Error("Filen är för stor.");
+    const incoming=JSON.parse(await file.text());
+    const data=incoming&&incoming.app==="Fokuskompisen"?incoming.data:incoming;
+    if(!data||typeof data!=="object"||!Array.isArray(data.tasks)||data.tasks.length>5000||data.tasks.some(t=>!t||typeof t.name!=="string"||t.name.length>150||!["today","soon","later"].includes(t.priority)||typeof t.id!=="string"&&typeof t.id!=="number"))throw Error("Filen har inte ett giltigt Fokuskompisen-format.");
+    if(!confirm("Importen ersätter alla uppgifter och inställningar på den här enheten. Har du sparat en säkerhetskopia? Vill du fortsätta?"))return;
+    const validRoutines = Array.isArray(data.routines) ? data.routines.slice(0,100).filter(r => r && typeof r.name === "string" && Array.isArray(r.steps) && r.steps.length <= 30).map(r => ({
+      id: String(r.id || "r-" + Date.now() + "-" + Math.random()), name:r.name.slice(0,80), type:["morning","evening","other"].includes(r.type)?r.type:"other",
+      steps:r.steps.filter(x=>x && typeof x.text==="string").slice(0,30).map(x=>({id:String(x.id || "s-"+Math.random()),text:x.text.slice(0,120)})),
+      checkedDate:typeof r.checkedDate==="string"?r.checkedDate:"", checkedIds:Array.isArray(r.checkedIds)?r.checkedIds.map(String).slice(0,30):[]
+    })) : [];
+    const next={...EMPTY,moodHistory12:Array.isArray(data.moodHistory12)?data.moodHistory12.filter(e=>e&&typeof e.date==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&["low","medium","high"].includes(e.energy)).slice(-30):[],routines:validRoutines,name:String(data.name||"").slice(0,100),feeling:String(data.feeling||"").slice(0,5000),energy:String(data.energy||""),tasks:data.tasks.map(t=>({...t,name:t.name.slice(0,150),repeat:["none","daily","weekly"].includes(t.repeat)?t.repeat:"none",remind:/^([01]\d|2[0-3]):[0-5]\d$/.test(t.remind||"")?t.remind:""}))};
+    const prev=state;state=next;
+    if(!save()){state=prev;throw Error("Det gick inte att spara importen.")}
+    $("name").value=state.name;$("feeling").value=state.feeling;greeting();energy();render();renderRoutines09();
+    $("status").textContent="Importen är klar. Kontrollera dina uppgifter.";
+  }catch(err){$("status").textContent="Importen misslyckades: "+err.message}
+  finally{e.target.value=""}
+};
+greeting();energy();render();
+// Fokuskompisen 0.9 – Mina rutiner. Ingår i kontots state och JSON-säkerhetskopian.
+const routineId09 = () => (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+"-"+Math.random().toString(36).slice(2);
+const routineToday09 = () => { const d=new Date(); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-"); };
+// Tillfälliga redigeringsutkast sparas lokalt per konto och rutin.
+const routineDraftKey09 = id => "fokuskompisen09-routine-draft:" + String(activeUserId || "guest") + ":" + String(id);
+function readRoutineDraft09(id){try { const raw=localStorage.getItem(routineDraftKey09(id)); return raw?JSON.parse(raw):null; }catch(_){return null;}}
+function clearRoutineDraft09(id){try{localStorage.removeItem(routineDraftKey09(id));}catch(_){}}
+function renderRoutines09(){
+ const host=$("routineList"); if(!host)return;
+ host.replaceChildren();
+ const routines=Array.isArray(state.routines)?state.routines:[];
+ if(!routines.length){const p=document.createElement("p");p.className="notice";p.textContent="Du har inga rutiner ännu. Skapa din första rutin ovan 💜";host.append(p);return;}
+ for(const routine of routines){
+   if(!routine || !Array.isArray(routine.steps))continue;
+   const today=routineToday09();
+   const checked=new Set(routine.checkedDate===today && Array.isArray(routine.checkedIds)?routine.checkedIds:[]);
+   const article=document.createElement("article");article.className="panel routine-card09";
+   const heading=document.createElement("h3");heading.textContent=({morning:"🌅 ",evening:"🌙 ",other:"🌷 "}[routine.type]||"🌷 ")+routine.name;article.append(heading);
+   const count=document.createElement("p");count.className="small";count.textContent=checked.size+" av "+routine.steps.length+" steg klara idag";article.append(count);
+   const progress=document.createElement("progress");progress.max=routine.steps.length||1;progress.value=routine.steps.filter(x=>checked.has(x.id)).length;progress.setAttribute("aria-label","Framsteg för "+routine.name);article.append(progress);
+   for(const step of routine.steps){
+     const label=document.createElement("label");label.className="routine-step09";
+     const input=document.createElement("input");input.type="checkbox";input.checked=checked.has(step.id);
+     input.addEventListener("change",()=>{
+       if(!activeUserId||!syncReady){input.checked=!input.checked;$("routineStatus").textContent="Vänta tills kontot har laddats.";return;}
+       const before=JSON.stringify(routine);const current=new Set(routine.checkedDate===routineToday09() && Array.isArray(routine.checkedIds)?routine.checkedIds:[]);
+       if(input.checked)current.add(step.id);else current.delete(step.id);
+       routine.checkedDate=routineToday09();routine.checkedIds=[...current];
+       if(!save())Object.assign(routine,JSON.parse(before));renderRoutines09();
+     });
+     const span=document.createElement("span");span.textContent=step.text;label.append(input,span);visual09Decorate(span,step.text);article.append(label);
+   }
+   const actions=document.createElement("div");actions.className="actions";
+   const edit=document.createElement("button");edit.type="button";edit.className="alt";edit.textContent="✏️ Redigera";
+   edit.addEventListener("click",()=>{
+     const existing=article.querySelector(".routine-edit09");if(existing){existing.remove();return;}
+     const draft=readRoutineDraft09(routine.id);
+     const editor=document.createElement("div");editor.className="routine-edit09";
+     function field(labelText,tag,id,value){const label=document.createElement("label");label.htmlFor=id;label.textContent=labelText;const control=document.createElement(tag);control.id=id;control.value=value;editor.append(label,control);return control;}
+     const prefix="routine-edit-"+String(routine.id).replace(/[^a-zA-Z0-9_-]/g,"-");
+     const nameInput=field("Namn på rutinen","input",prefix+"-name",draft && typeof draft.name==="string"?draft.name:routine.name);nameInput.maxLength=80;
+     const typeInput=document.createElement("select");typeInput.id=prefix+"-type";
+     for(const [value,label] of [["morning","🌅 Morgon"],["evening","🌙 Kväll"],["other","🌷 Annan rutin"]]){const option=document.createElement("option");option.value=value;option.textContent=label;typeInput.append(option);}
+     typeInput.value=draft && ["morning","evening","other"].includes(draft.type)?draft.type:routine.type;
+     const typeLabel=document.createElement("label");typeLabel.htmlFor=typeInput.id;typeLabel.textContent="När passar den?";editor.append(typeLabel,typeInput);
+     const stepsInput=field("Steg – ett per rad (flytta rader för att ändra ordning, ta bort rad för att ta bort steg)","textarea",prefix+"-steps",draft && typeof draft.steps==="string"?draft.steps:routine.steps.map(x=>x.text).join("\n"));stepsInput.rows=Math.max(4,Math.min(12,routine.steps.length+1));stepsInput.maxLength=3600;
+     const storeDraft=()=>{try{localStorage.setItem(routineDraftKey09(routine.id),JSON.stringify({name:nameInput.value,type:typeInput.value,steps:stepsInput.value}));}catch(_){}};
+     nameInput.addEventListener("input",storeDraft);typeInput.addEventListener("change",storeDraft);stepsInput.addEventListener("input",storeDraft);
+     const feedback=document.createElement("p");feedback.className="small";feedback.setAttribute("role","alert");editor.append(feedback);
+     const buttons=document.createElement("div");buttons.className="actions";
+     const saveEdit=document.createElement("button");saveEdit.type="button";saveEdit.textContent="💾 Spara ändringar";
+     saveEdit.addEventListener("click",()=>{
+       if(!activeUserId||!syncReady){feedback.textContent="Vänta tills kontot har laddats.";return;}
+       const newName=nameInput.value.trim();const texts=stepsInput.value.split(/\r?\n/).map(t=>t.trim()).filter(Boolean);
+       if(!newName){feedback.textContent="Du måste skriva ett namn på rutinen.";nameInput.setAttribute("aria-invalid","true");nameInput.focus();return;}
+       nameInput.removeAttribute("aria-invalid");
+       if(!texts.length){feedback.textContent="Rutinen måste ha minst ett steg.";stepsInput.focus();return;}
+       if(texts.length>30||texts.some(t=>t.length>120)){feedback.textContent="Högst 30 steg och 120 tecken per steg.";return;}
+       const old=JSON.stringify(routine);const unused=[...routine.steps];
+       const nextSteps=texts.map((t,i)=>{
+         let pos=unused.findIndex(step=>step.text===t);
+         // Behåll ett befintligt stegs ID även om texten ändras på samma rad.
+         if(pos<0 && i<routine.steps.length)pos=unused.findIndex(step=>step.id===routine.steps[i].id);
+         const matched=pos>=0?unused.splice(pos,1)[0]:null;
+         return {id:matched?matched.id:routineId09(),text:t};
+       });
+       routine.name=newName;routine.type=typeInput.value;routine.steps=nextSteps;
+       routine.checkedIds=(routine.checkedIds||[]).filter(id=>nextSteps.some(step=>step.id===id));
+       if(!save()){Object.assign(routine,JSON.parse(old));feedback.textContent="Det gick inte att spara. Försök igen.";return;}
+       clearRoutineDraft09(routine.id);$("routineStatus").textContent="Ändringarna har sparats 💜";renderRoutines09();
+     });
+     const cancel=document.createElement("button");cancel.type="button";cancel.className="alt";cancel.textContent="Avbryt";cancel.addEventListener("click",()=>{clearRoutineDraft09(routine.id);editor.remove();});
+     buttons.append(saveEdit,cancel);editor.append(buttons);actions.before(editor);nameInput.focus();
+   });
+   const reset=document.createElement("button");reset.type="button";reset.className="alt";reset.textContent="↩ Börja om idag";
+   reset.addEventListener("click",()=>{if(!confirm("Börja om med denna rutins steg idag?"))return;const oldDate=routine.checkedDate,oldIds=routine.checkedIds;routine.checkedDate=routineToday09();routine.checkedIds=[];if(!save()){routine.checkedDate=oldDate;routine.checkedIds=oldIds;}renderRoutines09();});
+   const del=document.createElement("button");del.type="button";del.className="alt";del.textContent="🗑️ Ta bort rutin";
+   del.addEventListener("click",()=>{if(!confirm("Ta bort rutinen ”"+routine.name+"”?"))return;const old=state.routines;state.routines=old.filter(r=>r.id!==routine.id);if(!save())state.routines=old;else clearRoutineDraft09(routine.id);renderRoutines09();});
+   actions.append(edit,reset,del);article.append(actions);host.append(article);
+   if(readRoutineDraft09(routine.id)) edit.click();
+ }
+}
+$("routineAdd").addEventListener("click",()=>{
+ if(!activeUserId||!syncReady){$("routineStatus").textContent="Vänta tills ditt konto har laddats.";return;}
+ const name=$("routineName").value.trim();const steps=$("routineSteps").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+ if(!name||!steps.length){$("routineStatus").textContent="Skriv ett namn och minst ett steg.";return;}
+ if(steps.length>30||steps.some(s=>s.length>120)){ $("routineStatus").textContent="Högst 30 steg och 120 tecken per steg.";return; }
+ if(!Array.isArray(state.routines))state.routines=[];
+ if(state.routines.length>=100){$("routineStatus").textContent="Du kan ha högst 100 rutiner.";return;}
+ const routine={id:routineId09(),name,type:$("routineType").value,steps:steps.map(text=>({id:routineId09(),text})),checkedDate:"",checkedIds:[]};
+ state.routines.push(routine);
+ if(!save()){state.routines.pop();$("routineStatus").textContent="Kunde inte spara rutinen.";return;}
+ $("routineName").value="";$("routineSteps").value="";$("routineStatus").textContent="Rutinen har sparats 💜";renderRoutines09();
+});
+// Om sidan hålls öppen över midnatt, uppdateras dagens avbockningar.
+let routineDate09=routineToday09();setInterval(()=>{if(routineDate09!==routineToday09()){routineDate09=routineToday09();renderRoutines09();}},60000);
+
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+const scheduleStorageKey = "fokuskompisen07schedule";
+let scheduleActivities;
+try { const old = JSON.parse(localStorage.getItem(scheduleStorageKey) || "[]"); scheduleActivities = Array.isArray(old) ? old.filter(x => typeof x === "string") : []; } catch { scheduleActivities = []; }
+const scheduleButton = document.getElementById("addScheduleActivity");
+const visualIcons15 = ["🌅","🥣","🧹","📚","🚶","🛒","☕","💊","🛁","🌙","💜"];
+const iconKey15 = "fokuskompisen15icons";
+const doneKey15 = "fokuskompisen15done";
+function readVisual15(key){try {const x=JSON.parse(localStorage.getItem(key)||"{}");return x&&typeof x==="object"&&!Array.isArray(x)?x:{};}catch{return {};}}
+let visualIconsSaved15=readVisual15(iconKey15);
+let visualDone15=readVisual15(doneKey15);
+function saveSchedule15(){localStorage.setItem(scheduleStorageKey,JSON.stringify(scheduleActivities));updateHomeSchedule();}
+function splitSchedule15(value){const match=value.match(/^([01]?\d|2[0-3]):[0-5]\d\s*[–-]\s*(.*)$/);return match?{time:match[0].slice(0,5),name:match[2]}:{time:"",name:value};}
+function renderVisualSchedule15(){
+ const container=document.getElementById("scheduleActivities");container.replaceChildren();
+ if(!scheduleActivities.length){const p=document.createElement("p");p.textContent="Inga aktiviteter ännu. Lägg till en när du vill.";container.appendChild(p);return;}
+ const order=scheduleActivities.map((value,index)=>({value,index,...splitSchedule15(value)}));
+ order.sort((a,b)=>a.time&&b.time?a.time.localeCompare(b.time):a.time?-1:b.time?1:a.index-b.index);
+ order.forEach(({value,index,time,name})=>{
+  const card=document.createElement("div");card.className="visual-card15";
+  const icon=document.createElement("button");icon.type="button";icon.className="visual-icon15";icon.textContent=visualIconsSaved15[value]||"🌷";icon.setAttribute("aria-label","Byt symbol för "+name);
+  icon.onclick=()=>{const options=visualIcons15.map((v,i)=>(i+1)+". "+v).join("  ");const n=prompt("Välj en symbol genom att skriva dess nummer:\n"+options);if(n===null)return;const choice=visualIcons15[Number(n)-1];if(!choice){alert("Välj ett nummer mellan 1 och "+visualIcons15.length);return;}visualIconsSaved15[value]=choice;localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));renderVisualSchedule15();};
+  const label=document.createElement("div");label.className="visual-label15";const title=document.createElement("strong");title.textContent=(time?time+" – ":"")+name;label.appendChild(title);
+  const checked=document.createElement("input");checked.type="checkbox";checked.checked=!!visualDone15[value];checked.setAttribute("aria-label","Markera "+name+" som klar");checked.onchange=()=>{visualDone15[value]=checked.checked;localStorage.setItem(doneKey15,JSON.stringify(visualDone15));card.classList.toggle("visual-done15",checked.checked);};
+  const edit=document.createElement("button");edit.type="button";edit.textContent="✏️ Redigera";edit.onclick=()=>{const next=prompt("Ändra tid och aktivitet (t.ex. 08:30 – Frukost):",value);if(next===null||!next.trim())return;const nv=next.trim();scheduleActivities[index]=nv;visualIconsSaved15[nv]=visualIconsSaved15[value]||"🌷";visualDone15[nv]=!!visualDone15[value];delete visualIconsSaved15[value];delete visualDone15[value];localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));localStorage.setItem(doneKey15,JSON.stringify(visualDone15));saveSchedule15();renderVisualSchedule15();};
+  const del=document.createElement("button");del.type="button";del.textContent="🗑️ Ta bort";del.onclick=()=>{if(!confirm("Vill du ta bort aktiviteten?"))return;scheduleActivities.splice(index,1);delete visualDone15[value];delete visualIconsSaved15[value];localStorage.setItem(iconKey15,JSON.stringify(visualIconsSaved15));localStorage.setItem(doneKey15,JSON.stringify(visualDone15));saveSchedule15();renderVisualSchedule15();};
+  const actions=document.createElement("div");actions.className="visual-actions15";actions.append(edit,del);
+  card.append(icon,label,checked,actions);card.classList.toggle("visual-done15",checked.checked);container.appendChild(card);
+ });
+}
+scheduleButton.addEventListener("click",()=>{
+ const name=prompt("Vad vill du lägga till i ditt dagsschema?");if(!name||!name.trim())return;
+ const time=prompt("Vilken tid? Skriv t.ex. 08:30 (eller lämna tomt)");if(time===null)return;
+ const trimmed=time.trim();if(trimmed&&!/^([01]?\d|2[0-3]):[0-5]\d$/.test(trimmed)){alert("Ange en tid som 08:30 eller lämna tomt.");return;}
+ const value=(trimmed?trimmed+" – ":"")+name.trim();scheduleActivities.push(value);saveSchedule15();renderVisualSchedule15();
+});
+renderVisualSchedule15();
+    // Visa sparade aktiviteter på den personliga startsidan
+function updateHomeSchedule() {
+  const container = document.getElementById("homeScheduleContent");
+      if (!container) return;
+  container.replaceChildren();
+
+  if (scheduleActivities.length === 0) {
+    container.textContent = "Inga aktiviteter i schemat ännu.";
+    return;
+  }
+
+  scheduleActivities.forEach(activityName => {
+    const row = document.createElement("p");
+    row.textContent = activityName;
+    container.appendChild(row);
+  });
+}
+    // Visa dagens uppgifter på startsidan
+function updateHomeTasks() {
+  const container = document.getElementById("homeTasksContent");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  const today = dateKey(new Date());
+  const todaysTasks = state.tasks.filter(task => dueOn(task, today));
+
+  if (todaysTasks.length === 0) {
+    container.textContent = "Inga uppgifter planerade för idag.";
+    return;
+  }
+
+  todaysTasks.forEach(task => {
+    const row = document.createElement("p");
+    row.textContent = "☐ " + task.name;
+    container.appendChild(row);
+  });
+}
+  
+// Visa dagens påminnelser på startsidan
+function updateHomeReminders() {
+  const container = document.getElementById("homeRemindersContent");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  const today = dateKey(new Date());
+  const reminders = state.tasks.filter(task =>
+    !task.done &&
+    task.remind &&
+    (!task.date || dueOn(task, today))
+  );
+
+  if (reminders.length === 0) {
+    container.textContent = "Inga påminnelser för idag.";
+    return;
+  }
+
+  reminders.forEach(task => {
+    const row = document.createElement("p");
+    row.textContent = "🔔 " + task.remind + " – " + task.name;
+    container.appendChild(row);
+  });
+}
+updateHomeSchedule();
+    updateHomeTasks();
+    updateHomeReminders();
+document.getElementById("signupButton").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const message = document.getElementById("loginMessage");
+
+  if (!email || password.length < 12) {
+    message.textContent = "Ange en e-postadress och ett lösenord med minst 12 tecken.";
+    return;
+  }
+
+  message.textContent = "Skapar konto...";
+
+  const { error } = await fokusSupabase.auth.signUp({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? "Kunde inte skapa kontot: " + error.message
+    : "Kontrollera din e-post för att bekräfta kontot. 💜";
+});
+document.getElementById("loginButton").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const message = document.getElementById("loginMessage");
+
+  if (!email || !password) {
+    message.textContent = "Fyll i både e-postadress och lösenord.";
+    return;
+  }
+
+  message.textContent = "Loggar in...";
+
+  try {
+    const { error } = await fokusSupabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    message.textContent = error
+      ? "Inloggningen misslyckades. Kontrollera dina uppgifter."
+      : "Du är inloggad! 💜";
+  } catch (error) {
+    message.textContent = "Det gick inte att logga in just nu.";
+  }
+});
+
+document.getElementById("resetPasswordButton").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const message = document.getElementById("loginMessage");
+
+  if (!email) {
+    message.textContent = "Fyll i din e-postadress först.";
+    return;
+  }
+
+  message.textContent = "Skickar återställningsmejl...";
+
+  try {
+    const { error } = await fokusSupabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://miichajoh.github.io/fokuskompisen-test/"
+    });
+
+    message.textContent = error
+      ? "Kunde inte skicka mejlet: " + error.message
+      : "Om adressen finns registrerad får du ett mejl för att återställa lösenordet. 💜";
+  } catch (error) {
+    message.textContent = "Det gick inte att skicka mejlet just nu.";
+  }
+});
+
+
+const newPasswordSection = document.getElementById("newPasswordSection");
+const newPasswordMessage = document.getElementById("newPasswordMessage");
+
+const loginSection = document.getElementById("loginSection");
+const headerActions = document.getElementById("headerActions");
+const headerLogout = document.getElementById("headerLogout");
+const loginStatus = document.getElementById("loginMessage");
+let passwordRecoveryActive = false;
+let authReady = false;
+
+function displayAuthState(session) {
+  authReady = true;
+  const loggedIn = Boolean(session && session.user);
+  const showApp = loggedIn && !passwordRecoveryActive;
+  loginSection.hidden = showApp;
+  headerActions.hidden = !showApp;
+  // Supabase kan skicka SIGNED_IN igen när en flik får fokus.
+  // Dölj inte aktuell sida vid en sådan förnyelse av samma konto.
+  const sameAccountVisible = showApp && activeUserId === session.user.id &&
+    !document.getElementById(pages[currentPage08] || "homePage").hidden;
+  if (sameAccountVisible) return;
+  mainMenu.hidden = true;
+  menuButton.setAttribute("aria-expanded", "false");
+  Object.values(pages).forEach(id => {
+    const section = document.getElementById(id);
+    if (section) section.hidden = true;
+  });
+  if (showApp) {
+    // Återställ kontots lokala uppgifter direkt vid offline-start.
+    // Annars kan den äldre 0.7-lagringen visas innan asynkron auth-hämtning körs.
+    if (session?.user?.id) {
+      const id = session.user.id;
+      const cached = localStorage.getItem(accountKey(id));
+      if (cached) {
+        try {
+          state = safeState(JSON.parse(cached));
+          activeUserId = id;
+          syncReady = true;
+          drawAccountState();
+          syncMessage("Visar senast sparade kontouppgifter på enheten.");
+        } catch (e) {
+          syncMessage("Kunde inte läsa den lokala kontokopian.");
+        }
+      }
+    }
+    const saved = readNav08();
+    if (saved.userId && saved.userId !== session.user.id) {
+      try { sessionStorage.removeItem(NAV_KEY_08); } catch (_) {}
+      showPage("home");
+    } else {
+      showPage(pages[saved.page] ? saved.page : "home");
+    }
+    rememberNav08({userId: session.user.id});
+    document.getElementById("loginPassword").value = "";
+  }
+}
+
+fokusSupabase.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    passwordRecoveryActive = true;
+    newPasswordSection.hidden = false;
+    newPasswordMessage.textContent = "Välj ditt nya lösenord. 💜";
+  }
+  if (event === "SIGNED_OUT") {
+    try { sessionStorage.removeItem(NAV_KEY_08); } catch (_) {}
+    currentPage08 = "home";
+    passwordRecoveryActive = false;
+    newPasswordSection.hidden = true;
+    loginStatus.textContent = "Du har loggat ut. 💜";
+  }
+  displayAuthState(session);
+  if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "SIGNED_OUT") {
+    // INITIAL_SESSION måste alltid läsa kontocachen. displayAuthState kan redan
+    // ha satt activeUserId, vilket tidigare gjorde att loadAccount hoppades över.
+    if (event === "INITIAL_SESSION" || event === "SIGNED_OUT" ||
+        session?.user?.id !== activeUserId || !syncReady) {
+      setTimeout(() => { void loadAccount(session); }, 0);
+    }
+  }
+});
+
+fokusSupabase.auth.getSession().then(({data, error}) => {
+  if (!authReady && !error) { displayAuthState(data.session); void loadAccount(data.session); }
+  if (error) loginStatus.textContent = "Kunde inte kontrollera inloggningen. Försök igen.";
+}).catch(() => { loginStatus.textContent = "Kunde inte kontrollera inloggningen. Kontrollera internetanslutningen."; });
+
+headerLogout.addEventListener("click", async () => {
+  if (!window.confirm("Vill du logga ut från Fokuskompisen?")) return;
+  headerLogout.disabled = true;
+  try {
+    const {error} = await fokusSupabase.auth.signOut();
+    if (error) { loginStatus.textContent = "Utloggningen misslyckades. Försök igen."; }
+  } catch (error) {
+    loginStatus.textContent = "Det gick inte att logga ut just nu.";
+  } finally { headerLogout.disabled = false; }
+});
+
+// Kontoradering: endast den inloggade användaren, med dubbel bekräftelse.
+// Edge Function måste verifiera användarens token på serversidan.
+const deleteAccountButton = document.getElementById("deleteAccountButton");
+deleteAccountButton.addEventListener("click", async () => {
+  mainMenu.hidden = true;
+  menuButton.setAttribute("aria-expanded", "false");
+  if (!navigator.onLine) {
+    alert("Du behöver internet för att radera kontot.");
+    return;
+  }
+  const { data: sessionData, error: sessionError } = await fokusSupabase.auth.getSession();
+  const user = sessionData?.session?.user;
+  if (sessionError || !user || user.id !== activeUserId) {
+    alert("Vi kunde inte bekräfta ditt konto. Logga in igen och försök på nytt.");
+    return;
+  }
+  if (!confirm("VARNING! Ditt konto och dess sparade uppgifter i molnet kommer att raderas permanent. Detta går inte att ångra. Vill du fortsätta?")) return;
+  const confirmation = prompt('Skriv RADERA för att bekräfta permanent kontoradering:');
+  if (confirmation !== "RADERA") {
+    if (confirmation !== null) alert("Kontot har inte raderats.");
+    return;
+  }
+  deleteAccountButton.disabled = true;
+  deleteAccountButton.textContent = "⏳ Raderar kontot…";
+  try {
+    const { data, error } = await fokusSupabase.functions.invoke("delete-account---", {
+      method: "POST",
+      body: {},
+        headers: {
+  Authorization: `Bearer ${sessionData.session.access_token}`,
+},
+    });
+    if (error || data?.message !== "Kontot har raderats.") {
+      throw new Error("Servern bekräftade inte kontoraderingen.");
+    }
+    // Stoppa väntande synkronisering och ta bort kontobunden lokal data.
+    clearTimeout(syncTimer);
+    accountGeneration++;
+    syncReady = false;
+    activeUserId = null;
+    try {
+      localStorage.removeItem(accountKey(user.id));
+      localStorage.removeItem(pendingKey(user.id));
+      const prefixes = ["fokuskompisen09-routine-draft:" + user.id + ":"];
+      const exactKeys = ["fokuskompisen09-kickoff:" + user.id,
+        "fokuskompisen10-welcome:" + user.id];
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && (prefixes.some(prefix => key.startsWith(prefix)) || exactKeys.includes(key))) localStorage.removeItem(key);
+      }
+      sessionStorage.removeItem(NAV_KEY_08);
+    } catch (_) { /* Lagring kan vara blockerad. */ }
+    await fokusSupabase.auth.signOut({ scope: "local" });
+    state = safeState(null);
+    displayAuthState(null);
+    loginStatus.textContent = "Ditt konto har raderats. 💜";
+    alert("Ditt konto har raderats. 💜");
+  } catch (err) {
+    alert("Kontoraderingen kunde inte bekräftas. Försök inte flera gånger direkt. Kontakta fokuskompisen.app@gmail.com om du är osäker.");
+  } finally {
+    deleteAccountButton.disabled = false;
+    deleteAccountButton.textContent = "🗑️ Radera mitt konto";
+  }
+});
+
+document.getElementById("saveNewPasswordButton").addEventListener("click", async () => {
+  const password = document.getElementById("newPassword").value;
+
+  if (password.length < 12) {
+    newPasswordMessage.textContent = "Lösenordet måste innehålla minst 12 tecken.";
+    return;
+  }
+
+  newPasswordMessage.textContent = "Sparar nytt lösenord...";
+
+  try {
+    const { error } = await fokusSupabase.auth.updateUser({
+      password: password
+    });
+
+    if (error) {
+      newPasswordMessage.textContent = "Kunde inte spara lösenordet: " + error.message;
+      return;
+    }
+
+    newPasswordMessage.textContent = "Ditt nya lösenord är sparat! 💜";
+    document.getElementById("newPassword").value = "";
+    newPasswordSection.hidden = true;
+    passwordRecoveryActive = false;
+    const { data } = await fokusSupabase.auth.getSession();
+    displayAuthState(data.session);
+  } catch (error) {
+    newPasswordMessage.textContent = "Det gick inte att spara lösenordet just nu.";
+  }
+});
+
+
+// Tangentbordsstöd för den synliga filväljarknappen.
+const backupPickerLabel = document.querySelector('#backupPage label[for="import"]');
+if (backupPickerLabel) backupPickerLabel.addEventListener('keydown', event => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    document.getElementById('import').click();
+  }
+});
+
+// Fokuskompisen 0.9: offline-demo. Ingen AI-tjänst eller meddelandelagring.
+(function initAiDemo(){
+ const messages=document.getElementById('aiMessages');
+ const input=document.getElementById('aiInput');
+ const tone=document.getElementById('aiTone');
+ const length=document.getElementById('aiLength');
+ // Valen sparas enbart lokalt. Själva chattmeddelandena sparas inte.
+ const AI_PREFS_KEY='fokuskompisen09_ai_preferences';
+ try {
+   const prefs=JSON.parse(localStorage.getItem(AI_PREFS_KEY)||'{}');
+   if(['warm','clear','peppy'].includes(prefs.tone)) tone.value=prefs.tone;
+   if(['short','medium','long'].includes(prefs.length)) length.value=prefs.length;
+ } catch (_) { /* Appen fungerar även om lagringen inte är tillgänglig. */ }
+ function saveAiPrefs(){
+   try { localStorage.setItem(AI_PREFS_KEY,JSON.stringify({tone:tone.value,length:length.value})); } catch (_) {}
+ }
+ tone.addEventListener('change',saveAiPrefs);
+ length.addEventListener('change',saveAiPrefs);
+
+ if(!messages || !input) return;
+ function addMessage(sender, content){
+   const row=document.createElement('p');
+   const label=document.createElement('strong');
+   label.textContent=sender+': ';
+   row.append(label,document.createTextNode(content));
+   messages.append(row);
+   messages.scrollTop=messages.scrollHeight;
+ }
+ function reply(message){
+   const m=message.toLocaleLowerCase('sv');
+   let steps;
+   if(/städ|städa|disk|tvätt|plocka/.test(m)) steps=['Välj en liten yta eller tre saker.','Gör bara den delen i två minuter.','Stanna upp och välj om du vill fortsätta eller vila.'];
+   else if(/plan|schema|tid|dag|stress/.test(m)) steps=['Välj en sak som är viktig för dig idag.','Dela den i ett första litet steg.','Lägg in en paus och lämna utrymme för ändringar.'];
+   else if(/trött|orkar|energi|jobbigt/.test(m)) steps=['Känn efter vad som är rimligt just nu.','Välj ett mycket litet steg eller vila.','Det räcker att börja där du är.'];
+   else steps=['Berätta vilken uppgift du vill ha hjälp med.','Vi kan dela upp den i små, hanterbara steg.','Du bestämmer själv takten.'];
+   const intro=tone.value==='clear'?'Ett konkret förslag:':tone.value==='peppy'?'Vi tar det steg för steg!':'Vi kan ta en liten sak i taget. 💜';
+   if(length.value==='short') return intro+' '+steps[0];
+   if(length.value==='long') return intro+' Här är en möjlig plan, som du gärna får anpassa: '+steps.map((x,i)=>(i+1)+'. '+x).join(' ')+' Du kan alltid ändra dig eller ta paus.';
+   return intro+' '+steps[0]+' '+steps[1];
+ }
+ function send(){const value=input.value.trim();if(!value)return;addMessage('Du',value);input.value='';addMessage('Demo-kompisen',reply(value));}
+ document.getElementById('aiSend').addEventListener('click',send);
+ document.getElementById('aiClear').addEventListener('click',()=>{messages.replaceChildren();addMessage('Demo-kompisen','Hej! Vad vill du ha hjälp med idag?');});
+ addMessage('Demo-kompisen','Hej! Vad vill du ha hjälp med idag?');
+})();
+
+// 0.9: Fristående offlinehjälp. Rör aldrig kontoobjekt, rutiner eller tidigare nycklar.
+(() => {
+  const el = id => document.getElementById(id);
+  const page = el('kickoffPage'), input = el('kickoffInput');
+  const rules = [
+    [/diskmaskin|diska|disk(?:en|$|\s)/i, ['Ställ en kopp eller tallrik vid diskhon.', 'Diska den saken eller ställ den i diskmaskinen.', 'Ta en sak till om du vill.']],
+    [/tvätta.*(?:hår|händer)|duscha/i, ['Ta fram en handduk.', 'Ta fram det du brukar använda för att tvätta dig.', 'Börja när du känner dig redo.']],
+    [/tvätt|tvätta kläder/i, ['Lägg ett plagg som behöver tvättas i tvättkorgen.', 'Samla två plagg till om du orkar.', 'Välj en liten omgång och följ plaggens tvättråd.']],
+    [/handla|inköp|köpa mat/i, ['Skriv ner en sak du behöver köpa.', 'Lägg till det viktigaste som saknas hemma.', 'Välj hur du vill handla: i butik, beställa eller be om hjälp.']],
+    [/laga mat|middag|lunch|frukost|baka/i, ['Välj en enkel maträtt eller ett recept.', 'Ta fram en ingrediens.', 'Läs och gör receptets första moment.']],
+    [/bädda/i, ['Lägg en kudde åt sidan på sängen.', 'Rätta till täcket en liten bit.', 'Lägg tillbaka kudden om du vill.']],
+    [/dammsug/i, ['Ta fram dammsugaren.', 'Gör plats på en liten bit av golvet.', 'Dammsug bara den lilla ytan först.']],
+    [/sovrum|städa|städ|plocka undan/i, ['Välj en sak som ligger framme där du vill städa.', 'Lägg den saken på sin plats. Om den saknar plats, lägg den åt sidan.', 'Plocka undan två saker till om du vill.']],
+    [/ringa|telefonsamtal/i, ['Skriv en mening om vad du vill säga eller fråga.', 'Ta fram numret du vill ringa.', 'Ring när du är redo och ha meningen framför dig.']],
+    [/mejl|mail|meddelande|brev/i, ['Öppna ett tomt utkast till ditt meddelande.', 'Skriv en mening om vad du vill säga.', 'Läs igenom och välj själv om du vill fortsätta eller skicka.']],
+    [/läxa|plugga|studera|skolarbete|läsa/i, ['Öppna materialet du behöver.', 'Välj en fråga eller ett kort stycke.', 'Läs eller arbeta med bara den delen först.']],
+    [/promenad|gå ut/i, ['Ta fram skorna du vill använda.', 'Ta på dig det du behöver för vädret.', 'Gå ut en kort stund om det passar dig.']],
+    [/räkning|faktura/i, ['Ta fram en räkning.', 'Titta på förfallodatumet.', 'Välj om du vill betala nu eller planera när du ska göra det.']]
+  ];
+  function makeSteps(text) {
+    const match = rules.find(([pattern]) => pattern.test(text));
+    return match ? {steps:match[1], known:true} : {known:false, steps:[
+      'Skriv eller tänk ut den allra minsta delen av uppgiften: ”' + text + '”.',
+      'Ta fram en sak som behövs för just den delen.',
+      'Prova den lilla delen en kort stund. Du får stanna när du vill.'
+    ]};
+  }
+  let owner = null, draft = {};
+  const key = () => 'fokuskompisen09-kickoff:' + owner;
+  function syncOwner() {
+    const id = activeUserId || null;
+    if (owner === id) return;
+    owner = id; draft = {}; input.value = '';
+    if (owner) try {
+      const saved = JSON.parse(localStorage.getItem(key()) || '{}');
+      if (typeof saved.text === 'string') draft.text = saved.text.slice(0,300);
+      if (typeof saved.task === 'string' && ['active','paused','done'].includes(saved.mode)) {
+        draft.task=saved.task.slice(0,300); draft.mode=saved.mode;
+        draft.index=Number.isInteger(saved.index) ? Math.max(0,Math.min(2,saved.index)) : 0;
+      }
+    } catch (_) { el('kickoffStorage').textContent='Kunde inte läsa tidigare hjälp. Du kan börja på nytt.'; }
+    input.value = draft.text || '';
+  }
+  function persist() {
+    if (!owner) return;
+    try { localStorage.setItem(key(),JSON.stringify(draft)); el('kickoffStorage').textContent=''; }
+    catch (_) { el('kickoffStorage').textContent='Kunde inte spara på enheten. Låt sidan vara öppen om du vill behålla hjälpen.'; }
+  }
+  function render() {
+    syncOwner();
+    const exists=Boolean(draft.task), done=draft.mode==='done', paused=draft.mode==='paused';
+    el('kickoffResult').hidden=!exists; el('kickoffActions').hidden=!exists || done;
+    if (!exists) return;
+    const plan=makeSteps(draft.task), index=draft.index || 0;
+    el('kickoffTask').textContent=draft.task;
+    el('kickoffProgress').textContent=done ? 'Avslutat för nu' : 'Steg '+(index+1)+' av '+plan.steps.length+(plan.known?'':' · Allmänt förslag');
+    el('kickoffStep').textContent=done ? 'Du har valt att avsluta för nu. Det du gjort får räcka. Du kan börja igen när du vill.' : paused ? 'Ta den tid du behöver. Ditt steg finns kvar när du vill fortsätta.' : plan.steps[index];
+    if(!done && !paused) visual09Decorate(el('kickoffStep'),plan.steps[index]);
+    el('kickoffNext').hidden=!paused && index===plan.steps.length-1;
+    el('kickoffNext').textContent=paused?'Fortsätt med samma steg':'Nästa steg';
+    el('kickoffPause').hidden=paused;
+  }
+  input.addEventListener('input',()=>{syncOwner(); draft.text=input.value; input.setCustomValidity(''); persist();});
+  el('kickoffForm').addEventListener('submit',event=>{
+    event.preventDefault(); syncOwner(); const text=input.value.trim();
+    if (!text) { input.setCustomValidity('Skriv vad du vill ha hjälp med.'); input.reportValidity(); return; }
+    draft={text:input.value,task:text,index:0,mode:'active'};persist();render();
+  });
+  el('kickoffNext').onclick=()=>{syncOwner(); if(!draft.task)return; if(draft.mode==='paused')draft.mode='active';else draft.index=Math.min(2,(draft.index||0)+1);persist();render();};
+  el('kickoffPause').onclick=()=>{syncOwner();if(!draft.task)return;draft.mode='paused';persist();render();};
+  el('kickoffDone').onclick=()=>{syncOwner();if(!draft.task)return;draft.mode='done';persist();render();};
+  new MutationObserver(()=>{if(!page.hidden)render();}).observe(page,{attributes:true,attributeFilter:['hidden']});
+  render();
+})();
+
+</script><div id="welcomeGuideOverlay" hidden>
+  <div id="welcomeGuideDialog" role="dialog" aria-modal="true" aria-labelledby="welcomeGuideTitle" aria-describedby="welcomeGuideText" tabindex="-1">
+    <div class="guide-symbol" id="welcomeGuideSymbol" aria-hidden="true">💜</div>
+    <p class="guide-count" id="welcomeGuideCount">Steg 1 av 4</p>
+    <h2 id="welcomeGuideTitle">Välkommen till Fokuskompisen!</h2>
+    <p id="welcomeGuideText">En sak i taget. Du bestämmer takten.</p>
+    <div class="guide-actions">
+      <button type="button" class="guide-secondary" id="welcomeGuideSkip">Hoppa över</button>
+      <button type="button" class="guide-secondary" id="welcomeGuideBack">Tillbaka</button>
+      <button type="button" id="welcomeGuideNext">Nästa</button>
+    </div>
+  </div>
+</div>
+<script id="welcome-guide-script">
+(()=>{
+  'use strict';
+  const steps=[
+    ['💜','Välkommen till Fokuskompisen!','Här får du hjälp att göra vardagen lite enklare. En sak i taget. Du bestämmer takten.'],
+    ['✅','Planera dina uppgifter','Lägg till det du behöver göra. Du kan få hjälp att dela upp stora uppgifter i små steg.'],
+    ['🌅','Skapa dina rutiner','Bygg morgon- och kvällsrutiner som passar dig. Du bestämmer vad som ska ingå.'],
+    ['🌱','Anpassa efter din energi','Välj hur mycket energi du har idag. Du får ta saker i din egen takt.']
+  ];
+  const byId=id=>document.getElementById(id);
+  const overlay=byId('welcomeGuideOverlay');
+  const dialog=byId('welcomeGuideDialog');
+  let step=0,previousFocus=null,lastAccount=null;
+  function key(){return 'fokuskompisen10welcome-v1-'+(typeof activeUserId!=='undefined'&&activeUserId?activeUserId:'device');}
+  function draw(){
+    const [symbol,title,description]=steps[step];
+    byId('welcomeGuideSymbol').textContent=symbol;
+    byId('welcomeGuideTitle').textContent=title;
+    byId('welcomeGuideText').textContent=description;
+    byId('welcomeGuideCount').textContent=`Steg ${step+1} av ${steps.length}`;
+    byId('welcomeGuideBack').hidden=step===0;
+    byId('welcomeGuideNext').textContent=step===steps.length-1?'Kom igång':'Nästa';
+  }
+  function open(){previousFocus=document.activeElement;step=0;draw();overlay.hidden=false;byId('welcomeGuideSkip').focus();}
+  function close(){overlay.hidden=true;try{localStorage.setItem(key(),'seen');}catch(_){};if(previousFocus&&previousFocus.isConnected)previousFocus.focus();}
+  byId('welcomeGuideOpen').addEventListener('click',open);
+  byId('welcomeGuideSkip').addEventListener('click',close);
+  byId('welcomeGuideBack').addEventListener('click',()=>{step=Math.max(0,step-1);draw();});
+  byId('welcomeGuideNext').addEventListener('click',()=>{if(step===steps.length-1)close();else{step++;draw();}});
+  overlay.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){event.preventDefault();close();}
+    if(event.key==='Tab'){
+      const buttons=[...dialog.querySelectorAll('button:not([hidden])')];
+      const first=buttons[0],last=buttons[buttons.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
+  });
+  function check(){
+    const actions=byId('headerActions');
+    if(actions.hidden){lastAccount=null;return;}
+    const account=typeof activeUserId!=='undefined'&&activeUserId?activeUserId:null;
+    if(!account||account===lastAccount)return;
+    lastAccount=account;
+    try{if(localStorage.getItem(key())!=='seen')open();}catch(_){open();}
+  }
+  new MutationObserver(check).observe(byId('headerActions'),{attributes:true,attributeFilter:['hidden']});
+  // Kontoinläsning sker asynkront; observera bara synliga app-sidor, inte kontodata.
+  new MutationObserver(check).observe(byId('homePage'),{attributes:true,attributeFilter:['hidden']});
+  check();
+})();
+</script>
+<style id="menu13Style">#mainMenu{max-height:75vh;overflow:auto;text-align:left;display:flex;flex-direction:column;align-items:stretch;gap:9px}#mainMenu #menuSearch13{width:100%;max-width:100%;margin:8px 0}#mainMenu .menuGroup13{width:100%;border:1px solid #b5a0cf;border-radius:12px;margin:0;background:#eae1f4;color:#392d47;overflow:hidden}#mainMenu .menuGroup13 summary{padding:12px;cursor:pointer;font-weight:700}#mainMenu .menuGroup13 button{display:block;width:100%;text-align:left;margin:3px 0}#wins13List .win13Row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #ddd;padding:8px 0}#wins13List .win13Row button{flex-shrink:0}@media(max-width:600px){#mainMenu .menuGroup13 button{width:100%}}
+/* Menyfix 1.3: en kolumn, tydlig kontrast i båda teman */
+#mainMenu .menuGroup13 summary{display:list-item;list-style-position:inside;color:#392d47;background:#eae1f4;min-height:50px;line-height:1.5}
+#mainMenu .menuGroup13[open] summary{background:#d9c6ed;border-bottom:1px solid #b5a0cf}
+#mainMenu .menuGroup13 button{width:calc(100% - 16px);margin:6px 8px;background:#f8f4fc;color:#392d47;border:1px solid #b5a0cf}
+#mainMenu .menuGroup13 button:hover{background:#e4d8f2}
+#mainMenu .menuGroup13 summary:focus-visible{outline:3px solid #7954a2;outline-offset:-3px}
+body[data-theme="dark"] #mainMenu .menuGroup13{background:#393448;color:#f8f3ff;border-color:#8877a5}
+body[data-theme="dark"] #mainMenu .menuGroup13 summary{background:#49415f;color:#fff}
+body[data-theme="dark"] #mainMenu .menuGroup13[open] summary{background:#655080;border-bottom-color:#9b86b7}
+body[data-theme="dark"] #mainMenu .menuGroup13 button{background:#413b54;color:#fff;border-color:#827399}
+body[data-theme="dark"] #mainMenu .menuGroup13 button:hover{background:#5d5076}
+body[data-theme="dark"] #mainMenu #menuSearch13{background:#413b54;color:#fff;border-color:#9180aa}
+body[data-theme="dark"] #mainMenu #menuSearch13::placeholder{color:#c9bed9;opacity:1}
+body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
+/* Menyfix 2: låt öppnade grupper växa utan att klippas av */
+#mainMenu{max-height:none;overflow:visible}
+#mainMenu .menuGroup13{flex:0 0 auto;overflow:visible;min-height:0}
+#mainMenu .menuGroup13[open]{height:auto}
+#mainMenu .menuGroup13[hidden],#mainMenu .menuGroup13 button[hidden]{display:none !important}
+</style>
+<script>
+(function(){
+ const search=document.getElementById('menuSearch13');
+ const menu=document.getElementById('mainMenu');
+ search.addEventListener('input',function(){const q=this.value.trim().toLocaleLowerCase('sv');menu.querySelectorAll('.menuGroup13').forEach(group=>{let any=false;group.querySelectorAll('button').forEach(btn=>{const match=!q||btn.textContent.toLocaleLowerCase('sv').includes(q);btn.hidden=!match;if(match)any=true;});group.hidden=!any;if(q&&any)group.open=true;});});
+ window.renderWins13=function(){const list=document.getElementById('wins13List');if(!list)return;list.replaceChildren();const data=readWins13();if(!data.length){list.textContent='Inga egna segrar sparade ännu. Det är helt okej. 💜';return;}data.forEach(entry=>{const row=document.createElement('div');row.className='win13Row';const label=document.createElement('span');label.textContent=entry.text+' · '+entry.date;const del=document.createElement('button');del.type='button';del.textContent='Radera';del.setAttribute('aria-label','Radera '+entry.text);del.addEventListener('click',()=>{if(!confirm('Vill du radera den här segern?'))return;writeWins13(readWins13().filter(x=>x.id!==entry.id));renderWins13();});row.append(label,del);list.append(row);});};
+ function winsKey13(){return 'fokuskompisen13-wins:'+String(typeof activeUserId!=='undefined'&&activeUserId?activeUserId:'no-account');}
+ function readWins13(){if(typeof activeUserId==='undefined'||!activeUserId)return [];try{const v=JSON.parse(localStorage.getItem(winsKey13())||'[]');return Array.isArray(v)?v:[];}catch(_){return [];}}
+ function writeWins13(items){if(typeof activeUserId==='undefined'||!activeUserId)return false;try{localStorage.setItem(winsKey13(),JSON.stringify(items));return true;}catch(_){return false;}}
+ document.getElementById('wins13Add').addEventListener('click',()=>{const input=document.getElementById('wins13Input');const msg=document.getElementById('wins13Message');const value=input.value.trim();if(!value){msg.textContent='Skriv något du klarat av först.';return;}if(typeof activeUserId==='undefined'||!activeUserId){msg.textContent='Logga in för att spara.';return;}const items=readWins13();items.unshift({id:String(Date.now())+'-'+Math.random().toString(36).slice(2),text:value,date:new Date().toLocaleDateString('sv-SE')});if(!writeWins13(items)){msg.textContent='Det gick inte att spara på den här enheten.';return;}input.value='';msg.textContent='Din seger är sparad! 💜';renderWins13();});
+})();
+</script>
+<script>
+(function(){
+ function goCalm14(page){
+   if(typeof showPage !== 'function') return;
+   showPage(page);
+   const menu=document.getElementById('mainMenu');
+   const toggle=document.getElementById('menuButton');
+   if(menu) menu.hidden=true;
+   if(toggle) toggle.setAttribute('aria-expanded','false');
+   window.scrollTo(0,0);
+ }
+ document.getElementById('calm14Quick').addEventListener('click',()=>goCalm14('calm14'));
+ document.getElementById('calm14Pause').addEventListener('click',()=>goCalm14('pause'));
+ document.getElementById('calm14One').addEventListener('click',()=>goCalm14('focus11'));
+ document.getElementById('calm14Back').addEventListener('click',()=>goCalm14('home'));
+})();
+</script>
+</body></html>

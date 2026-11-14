@@ -1,0 +1,11 @@
+Fokuskompisen 0.8 – separat testversion
+
+Ladda upp index.html, sw.js och manifest.webmanifest till ett NYTT GitHub-repository, exempelvis fokuskompisen-08-test. Ändra inte 0.6 eller 0.7.
+
+Nytt: Den gamla Idébanken finns kvar. Smarta förslag med fyra kategorier och steg-för-steg-hjälp fungerar offline. AI Premium är endast en informationsruta; ingen AI-anslutning eller betalning.
+
+OBS: 0.8 kör på en annan webbadress och kan därför inte automatiskt läsa 0.7:s lokala webbläsardata. Kontrollera säkerhetskopia och kontosynk innan du använder den för riktiga uppgifter.
+
+TESTFIX: Förbättrad läsbarhet i Idébanken samt separata knappar Till Idébanken och Till startsidan. Till Idébanken behåller vald kategori.
+
+0.8 test: Min egen uppgift (regelbaserade steg efter energinivå), spara som uppgift med egna steg. Ingen AI-anslutning.

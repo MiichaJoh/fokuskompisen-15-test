@@ -1,0 +1,17 @@
+Fokuskompisen 0.9 – Bildstöd TEST
+
+Nyhet: enkla inbyggda symboler för uppgifter, rutinernas steg och Hjälp mig komma igång.
+I Inställningar kan bildstödet slås av och på för det inloggade kontot på enheten.
+Symbolerna är förslag baserade på nyckelord, inte AI-genererade bilder. Okända uppgifter får en neutral groddsymbol.
+Inga befintliga konton, uppgifter, rutiner eller lagringsnycklar migreras eller raderas.
+Service worker-cache har fått nytt versionsnamn för uppdatering.
+
+Testa:
+1. Öppna appen och se symboler på Mina uppgifter.
+2. Öppna Mina rutiner och kontrollera symbolerna vid stegen.
+3. Öppna Hjälp mig komma igång, skriv 'Diska' och starta hjälpen.
+4. Inställningar > Bildstöd: stäng av och kontrollera att symbolerna döljs, slå på igen.
+5. Uppdatera sidan och kontrollera att inställningen finns kvar.
+6. Testa offline och på ett annat testkonto.
+
+OBS: Uppgifternas innehåll och sparade kontodata ändras inte av symbolerna.

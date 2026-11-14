@@ -1,0 +1,21 @@
+FOKUSKOMPISEN 1.0 – DESIGNTEST
+
+Den här ZIP-filen bygger på Fokuskompisen 0.9 TEST (12).
+Förändringarna gäller endast CSS/utseende på startsida och meny, sidans titel samt service workerns cachenyckel.
+Befintlig JavaScript-logik, Supabase-konfiguration och datalagringsnycklar är oförändrade.
+
+VIKTIGT:
+Ladda INTE upp filerna över den befintliga fungerande 0.9-sidan.
+Testa i ett SEPARAT GitHub Pages-repository, t.ex. fokuskompisen-10-design-test.
+Den nya testadressen har samma Supabase-projekt som 0.9. För inloggning kan den nya adressen behöva läggas till i Supabase Authentication > URL Configuration > Redirect URLs.
+Använd endast testkonto och behåll säkerhetskopian.
+
+Ändrat:
+- Mjukare kort och tydligare mellanrum
+- Större knappar och bättre fokusmarkering
+- Tvåkolumnsmeny på större skärmar, en kolumn på mobil
+- Startsidan får tydligare kort för uppgifter, schema och påminnelser
+- Färger och temaväxling bevaras
+- Ny cachenyckel för designprototypen
+
+Detta är en DESIGNTEST, inte en färdig 1.0-release.

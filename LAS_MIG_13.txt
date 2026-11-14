@@ -1,0 +1,1 @@
+Fokuskompisen 1.3 TEST: Ny grupperad och sökbar meny samt Mina små segrar. Egna segrar sparas lokalt per inloggat användar-ID och synkas INTE till Supabase eller säkerhetskopian. Testa på separat GitHub Pages-testadress innan produktionsbruk. Övriga funktioner behållna från 1.2.

@@ -1,0 +1,2 @@
+Fokuskompisen 1.2 – TEST
+Frivillig energihistorik: välj energi på startsidan och klicka Spara dagens energi. Visa de senaste sju registrerade dagarna, radera en dag. Sparas i befintligt kontos state och synkroniseras via befintlig mekanism. Ingen separat databas. Testa med testkonto. Ingen ändring av 1.0 eller 1.1.

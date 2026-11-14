@@ -1,0 +1,4 @@
+Fokuskompisen 1.4 TEST – Det är för mycket just nu.
+Ladda upp alla filer till ett SEPARAT GitHub-repository.
+Testa inloggning, lugnt läge, paus, fokusläge, mörkt tema, offline och befintliga uppgifter.
+Inga befintliga uppgifter ska raderas. Funktionen sparar inga nya måendeuppgifter.
