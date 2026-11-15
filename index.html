@@ -2523,7 +2523,7 @@ body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
  }
  let lastPeppKey='', peppIndex=0;
  function peppMessage(){
-  if(!prefs||prefs.frequency==='never')return;
+  if(!prefs)return; // Manuell pepp ska fungera även när automatiska meddelanden är avstängda.
   const key=selectedEnergy()+'_'+prefs.personality;
   if(key!==lastPeppKey){lastPeppKey=key;peppIndex=0;}
   const list=energyMessages[selectedEnergy()][prefs.personality];
