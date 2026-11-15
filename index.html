@@ -744,6 +744,7 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 </section>
 <section id="settingsPage">
   <h2>⚙️ Inställningar</h2>
+  <div class="panel" id="pet15SettingsAccess"><h3>🐾 Min djurkompis</h3><p>Här kan du visa din djurkompis igen, byta djur, namn och personlighet eller ändra hur ofta den pratar.</p><button type="button" id="pet15SettingsOpen">🐾 Visa eller ändra min djurkompis</button></div>
     <h3>🏠 Anpassa min startsida</h3>
 <p>Välj vad du vill se på din startsida:</p>
 
@@ -2503,6 +2504,7 @@ body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
  function populate(){const x=prefs||defaults();selectAnimal(x.animal);$('pet15Name').value=x.name;$('pet15Personality').value=x.personality;$('pet15Frequency').value=x.frequency;$('pet15Visible').checked=x.visible;status.textContent=''}
  function open(){if(!currentId){status.textContent='Logga in för att välja djurkompis.';return}populate();panel.hidden=false;panel.scrollIntoView({behavior:'smooth',block:'nearest'})}
  $('pet15Choose').addEventListener('click',open);
+ $('pet15SettingsOpen').addEventListener('click',()=>{const homeButton=document.querySelector('#mainMenu button[data-page="home"]')||document.querySelector('button[data-page="home"]');if(homeButton)homeButton.click();open();});
  $('pet15Later').addEventListener('click',()=>{panel.hidden=true;if(!prefs.seen){prefs.seen=true;cache(currentId,prefs);void syncPrefs(prefs)}});
  async function syncPrefs(value){if(!navigator.onLine)return false;try{const {error}=await fokusSupabase.auth.updateUser({data:{fokuskompisen_pet15:value}});return !error}catch(_){return false}}
  $('pet15Save').addEventListener('click',async()=>{if(!currentId||saveBusy)return;saveBusy=true;$('pet15Save').disabled=true;const value=clean({animal:selected,name:$('pet15Name').value.trim(),personality:$('pet15Personality').value,frequency:$('pet15Frequency').value,visible:$('pet15Visible').checked,chosen:true,seen:true});prefs=value;cache(currentId,value);apply();status.textContent='Sparat på den här enheten. Synkroniserar…';const synced=await syncPrefs(value);status.textContent=synced?'Sparat på ditt konto! 💜':'Sparat på den här enheten. Kontosynkronisering kräver internet – försök spara igen när du är online.';saveBusy=false;$('pet15Save').disabled=false;if(synced)setTimeout(()=>{panel.hidden=true},800)});
