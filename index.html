@@ -2497,6 +2497,38 @@ body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
  function clean(data){const x={...defaults(),...(data||{})};if(!valid(x.animal))x.animal='uggla';x.name=String(x.name||'').slice(0,32);if(!['warm','calm','playful','motivating'].includes(x.personality))x.personality='warm';if(!['often','sometimes','rarely','never'].includes(x.frequency))x.frequency='sometimes';x.visible=x.visible!==false;x.chosen=!!x.chosen;x.seen=!!x.seen;return x}
  function path(id){return './djurkompisar/'+id+'.webp'}
  const messages={warm:['Vi tar en sak i taget. 💜','Du får göra det i din egen takt. 💜'],calm:['Ingen brådska. Vi tar det lugnt. 🌿','En liten sak i taget räcker.'],playful:['High five med tassen! 🐾','Heja dig! Ett litet steg är också ett steg! ✨'],motivating:['Du kan börja med ett enda litet steg! 🌟','Bra jobbat! Vill du fortsätta eller vila?']};
+ const energyMessages={
+  low:{
+   warm:['Du behöver inte göra allt idag. Ett litet steg räcker. 💜','Du får vila om du behöver. Jag finns här. 💜','Det är okej att ta det extra lugnt idag. 🐾'],
+   calm:['Ingen brådska. Vi tar det varsamt. 🌿','En liten sak, eller en paus. Du väljer.','Du behöver inte skynda dig. 💜'],
+   playful:['En pytteliten tass i taget! 🐾','Vi tar en mjukstart, helt utan stress. 💜','Även små steg är värda en tass-high-five! 🐾'],
+   motivating:['Ett litet steg är också framsteg. 🌟','Vill du prova en enkel sak, eller vila först? 💜','Du bestämmer vad som känns möjligt idag. 🐾']
+  },
+  medium:{
+   warm:['Vad fint att du försöker! Vi tar en sak i taget. 💜','Du gör det i din egen takt. 🐾','Vill du fortsätta en stund eller ta en paus? 💜'],
+   calm:['Vi tar nästa steg i lugn takt. 🌿','Lagom är alldeles tillräckligt. 💜','En sak i taget, utan brådska. 🐾'],
+   playful:['Tassarna redo för ett lagom litet steg? 🐾','High five! Vi tar en sak i taget. ✨','Lite i taget kan bli mycket. Heja dig! 🐾'],
+   motivating:['Bra jobbat! Vill du ta nästa lilla steg? 🌟','Du är på väg framåt, i din takt. 💜','Vill du fortsätta eller vila en stund? 🐾']
+  },
+  high:{
+   warm:['Vad härligt med energi! Vad vill du börja med? 💜','Jag hejar på dig! Du väljer takten. 🌟','Vill du ta dig an något viktigt idag? 🐾'],
+   calm:['Du har energi idag. Vi kan ändå ta en sak i taget. 🌿','Vill du börja med det som känns viktigast? 💜','Det finns ingen brådska, även när orken är god. 🐾'],
+   playful:['Tjoho! Tassarna är redo för äventyr! 🐾','Vilken fart! Vill du ta nästa steg? ✨','High five med tassen! Nu kör vi, om du vill! 🐾'],
+   motivating:['Härligt! Vill du ta dig an nästa uppgift? Jag hejar på dig! 🌟','Du har energi! Vad vill du använda den till? ⚡','Snyggt! Redo för nästa steg, eller vill du pausa? 💜']
+  }
+ };
+ function selectedEnergy(){
+  const active=document.querySelector('#energy [data-energy].selected');
+  return active&&['low','medium','high'].includes(active.dataset.energy)?active.dataset.energy:'medium';
+ }
+ let lastPeppKey='', peppIndex=0;
+ function peppMessage(){
+  if(!prefs||prefs.frequency==='never')return;
+  const key=selectedEnergy()+'_'+prefs.personality;
+  if(key!==lastPeppKey){lastPeppKey=key;peppIndex=0;}
+  const list=energyMessages[selectedEnergy()][prefs.personality];
+  $('pet15Message').textContent=list[peppIndex++%list.length];
+ }
  let msgIndex=0;
  function apply(){if(!prefs)return;const a=animals.find(a=>a[0]===prefs.animal)||animals[0];const avatar=document.querySelector('#pet15Card .pet15Avatar');avatar.replaceChildren();const img=document.createElement('img');img.src=path(a[0]);img.alt=a[1];avatar.append(img);$('pet15Title').textContent=(prefs.name.trim()||'Din djurkompis')+' 💜';$('pet15Card').hidden=!prefs.visible;const greeting=messages[prefs.personality][0];$('pet15Message').textContent=prefs.frequency==='never'?'':greeting;}
  function selectAnimal(id){selected=id;grid.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.animal===id)));$('pet15PreviewImg').src=path(id);$('pet15PreviewImg').alt=animals.find(a=>a[0]===id)[1];$('pet15PreviewName').textContent=animals.find(a=>a[0]===id)[1]}
@@ -2513,6 +2545,6 @@ body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
  fokusSupabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){void loadFor(null)}else if(event==='SIGNED_IN'||event==='INITIAL_SESSION'){setTimeout(()=>{void loadFor(session)},0)}});
  fokusSupabase.auth.getSession().then(({data})=>{if(data?.session)void loadFor(data.session)}).catch(()=>{});
  // Den befintliga peppknappen behålls. Justera meddelandet efter vald personlighet.
- window.pet15CustomPepp=()=>{if(!prefs||prefs.frequency==='never')return;const list=messages[prefs.personality];$('pet15Message').textContent=list[msgIndex++%list.length]};
+ window.pet15CustomPepp=peppMessage;
 })();
 </script></body></html>
