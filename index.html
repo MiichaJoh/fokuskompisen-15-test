@@ -529,7 +529,25 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 #pet15Card button{min-height:44px}
 #pet15Card[hidden],#pet15Actions[hidden]{display:none!important}
 </style>
-</head>
+<style id="pet15ChooserStyle">
+#pet15Card .pet15Avatar img{width:78px;height:78px;object-fit:cover;border-radius:18px;display:block}
+#pet15Choose{margin:8px 8px 4px 0}
+#pet15Chooser[hidden]{display:none!important}
+#pet15Chooser{margin:12px 0;padding:16px;border:2px solid #bca5df;border-radius:18px;background:rgba(183,148,225,.12)}
+#pet15Chooser h3{margin:0 0 10px}
+#pet15Chooser .pet15Grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:9px;max-height:320px;overflow:auto;margin:12px 0}
+#pet15Chooser .pet15Animal{background:transparent;color:inherit;border:2px solid transparent;border-radius:14px;padding:5px;min-height:unset;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.82rem}
+#pet15Chooser .pet15Animal[aria-pressed="true"]{border-color:#8053b4;background:rgba(166,119,224,.18)}
+#pet15Chooser .pet15Animal img{width:70px;height:70px;object-fit:cover;border-radius:12px}
+#pet15Chooser label{display:block;margin-top:12px}
+#pet15Chooser input,#pet15Chooser select{display:block;width:100%;max-width:440px;min-height:44px;margin-top:5px}
+#pet15Chooser .pet15Preview{display:flex;align-items:center;gap:12px;margin:10px 0}
+#pet15Chooser .pet15Preview img{width:100px;height:100px;object-fit:cover;border-radius:16px}
+#pet15Chooser .pet15Controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+#pet15Chooser .pet15Controls button{min-height:44px}
+#pet15Chooser #pet15Status{min-height:1.4em}
+@media(max-width:480px){#pet15Chooser .pet15Grid{grid-template-columns:repeat(3,minmax(0,1fr))}#pet15Chooser .pet15Animal img{width:100%;height:auto;aspect-ratio:1}}
+</style></head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
 <script>
@@ -595,14 +613,25 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 </section>
     
 <section id="homePage" hidden><h2 id="hello">Hej!</h2><div id="pet15Card" aria-label="Djurkompisen">
- <div class="pet15Head"><span class="pet15Avatar" role="img" aria-label="Uggla">🦉</span><div><strong>Din djurkompis 💜</strong><p id="pet15Message" aria-live="polite">Hej! Vi tar en sak i taget.</p></div></div>
- <button type="button" id="pet15Toggle" aria-expanded="false" aria-controls="pet15Actions">🐾 Vad kan du hjälpa mig med?</button>
+ <div class="pet15Head"><span class="pet15Avatar" role="img" aria-label="Uggla">🦉</span><div><strong id="pet15Title">Din djurkompis 💜</strong><p id="pet15Message" aria-live="polite">Hej! Vi tar en sak i taget.</p></div></div>
+ <button type="button" id="pet15Choose">🐾 Välj eller ändra djurkompis</button>
+  <button type="button" id="pet15Toggle" aria-expanded="false" aria-controls="pet15Actions">🐾 Vad kan du hjälpa mig med?</button>
  <div id="pet15Actions" class="pet15Actions" hidden>
  <button type="button" id="pet15Kickoff">🌱 Hjälp mig komma igång</button>
  <button type="button" id="pet15Pause">☕ Ta en paus</button>
  <button type="button" id="pet15Encourage">💜 Ge mig lite pepp</button>
  </div>
-</div><p><button type="button" id="calm14Quick" class="calm14Quick">💜 Det är för mycket just nu</button></p><label for="name">Vad vill du bli kallad? (frivilligt)</label><input id="name" placeholder="Ditt namn"><p><strong>Hur mycket energi har du?</strong></p><div id="energy"><button data-energy="low">🪫 Låg</button><button data-energy="medium">🔋 Lagom</button><button data-energy="high">⚡ Hög</button></div><details id="mood12Panel" style="margin:16px 0;padding:14px;border:1px solid #bda9d8;border-radius:12px"><summary><strong>💜 Mitt mående – senaste 7 dagarna</strong></summary><p>Frivilligt. Du väljer själv om du vill spara dagens energi. Tidigare dagar kan raderas.</p><button type="button" id="mood12Save">Spara dagens energi</button><p id="mood12Notice" role="status" aria-live="polite"></p><div id="mood12History"></div></details><label for="feeling">Hur känns dagen? (frivilligt)</label><textarea id="feeling"></textarea><p class="panel" id="message">Du behöver inte göra allt idag.</p>
+</div><section id="pet15Chooser" hidden aria-label="Välj djurkompis">
+<h3>Välj din djurkompis 💜</h3><p>Välj ett djur, ge det ett namn och välj hur det ska uppmuntra dig. Du kan ändra allt senare.</p>
+<div class="pet15Grid" id="pet15Grid" role="group" aria-label="Välj ett av 20 djur"></div>
+<div class="pet15Preview"><img id="pet15PreviewImg" src="./djurkompisar/uggla.webp" alt="Valt djur"><strong id="pet15PreviewName">Uggla</strong></div>
+<label for="pet15Name">Vad ska din djurkompis heta? (frivilligt)</label><input id="pet15Name" maxlength="32" placeholder="Till exempel Luna">
+<label for="pet15Personality">Personlighet</label><select id="pet15Personality"><option value="warm">Varm och omtänksam</option><option value="calm">Lugn och trygg</option><option value="playful">Glad och busig</option><option value="motivating">Peppande och motiverande</option></select>
+<label for="pet15Frequency">Hur ofta får djurkompisen prata?</label><select id="pet15Frequency"><option value="often">Ofta</option><option value="sometimes" selected>Ibland – vid viktiga tillfällen</option><option value="rarely">Sällan – bara när jag ber om stöd</option><option value="never">Aldrig – visa bara djuret</option></select>
+<label><input type="checkbox" id="pet15Visible" checked> Visa djurkompisen på startsidan</label>
+<div class="pet15Controls"><button type="button" id="pet15Save">💜 Spara min djurkompis</button><button type="button" id="pet15Later">Jag väljer senare</button></div>
+<p id="pet15Status" role="status" aria-live="polite"></p>
+</section><p><button type="button" id="calm14Quick" class="calm14Quick">💜 Det är för mycket just nu</button></p><label for="name">Vad vill du bli kallad? (frivilligt)</label><input id="name" placeholder="Ditt namn"><p><strong>Hur mycket energi har du?</strong></p><div id="energy"><button data-energy="low">🪫 Låg</button><button data-energy="medium">🔋 Lagom</button><button data-energy="high">⚡ Hög</button></div><details id="mood12Panel" style="margin:16px 0;padding:14px;border:1px solid #bda9d8;border-radius:12px"><summary><strong>💜 Mitt mående – senaste 7 dagarna</strong></summary><p>Frivilligt. Du väljer själv om du vill spara dagens energi. Tidigare dagar kan raderas.</p><button type="button" id="mood12Save">Spara dagens energi</button><p id="mood12Notice" role="status" aria-live="polite"></p><div id="mood12History"></div></details><label for="feeling">Hur känns dagen? (frivilligt)</label><textarea id="feeling"></textarea><p class="panel" id="message">Du behöver inte göra allt idag.</p>
 <div id="personalHome">
   <h2>🏠 Min personliga startsida</h2>
   <p>Här kan du se det som är viktigast för dig idag.</p>
@@ -2450,8 +2479,38 @@ body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
  const encouragements=['Ett litet steg räcker långt. 💜','Du bestämmer takten. 🐾','Bra att du tar hand om dig själv. 💜','Det är okej att ta en paus. 🌿'];
  let next=0;
  document.getElementById('pet15Encourage').addEventListener('click',function(){
-  message.textContent=encouragements[next%encouragements.length];next++;
+  if(typeof window.pet15CustomPepp==='function'){window.pet15CustomPepp();return;}message.textContent=encouragements[next%encouragements.length];next++;
  });
 })();
 </script>
-</body></html>
+<script id="pet15ChooserScript">
+(function(){
+ const animals=[['uggla','Uggla'],['rav','Räv'],['varg','Varg'],['katt','Katt'],['kanin','Kanin'],['drake','Drake'],['hund','Hund'],['panda','Panda'],['bjorn','Björn'],['enhorning','Enhörning'],['hast','Häst'],['lejon','Lejon'],['tiger','Tiger'],['koala','Koala'],['pingvin','Pingvin'],['igelkott','Igelkott'],['radjur','Rådjur'],['fjaril','Fjäril'],['delfin','Delfin'],['elefant','Elefant']];
+ const $=id=>document.getElementById(id), panel=$('pet15Chooser'),grid=$('pet15Grid'), status=$('pet15Status');
+ let selected='uggla', currentId=null, prefs=null, initializedFor=null, saveBusy=false;
+ const valid=id=>animals.some(a=>a[0]===id);
+ const defaults=()=>({animal:'uggla',name:'',personality:'warm',frequency:'sometimes',visible:true,chosen:false,seen:false});
+ const cacheKey=id=>'fokuskompisen15_pet_'+id;
+ function readCache(id){try{const x=JSON.parse(localStorage.getItem(cacheKey(id))||'null');return x&&typeof x==='object'?x:null}catch(_){return null}}
+ function cache(id,value){try{localStorage.setItem(cacheKey(id),JSON.stringify(value))}catch(_){}}
+ function clean(data){const x={...defaults(),...(data||{})};if(!valid(x.animal))x.animal='uggla';x.name=String(x.name||'').slice(0,32);if(!['warm','calm','playful','motivating'].includes(x.personality))x.personality='warm';if(!['often','sometimes','rarely','never'].includes(x.frequency))x.frequency='sometimes';x.visible=x.visible!==false;x.chosen=!!x.chosen;x.seen=!!x.seen;return x}
+ function path(id){return './djurkompisar/'+id+'.webp'}
+ const messages={warm:['Vi tar en sak i taget. 💜','Du får göra det i din egen takt. 💜'],calm:['Ingen brådska. Vi tar det lugnt. 🌿','En liten sak i taget räcker.'],playful:['High five med tassen! 🐾','Heja dig! Ett litet steg är också ett steg! ✨'],motivating:['Du kan börja med ett enda litet steg! 🌟','Bra jobbat! Vill du fortsätta eller vila?']};
+ let msgIndex=0;
+ function apply(){if(!prefs)return;const a=animals.find(a=>a[0]===prefs.animal)||animals[0];const avatar=document.querySelector('#pet15Card .pet15Avatar');avatar.replaceChildren();const img=document.createElement('img');img.src=path(a[0]);img.alt=a[1];avatar.append(img);$('pet15Title').textContent=(prefs.name.trim()||'Din djurkompis')+' 💜';$('pet15Card').hidden=!prefs.visible;const greeting=messages[prefs.personality][0];$('pet15Message').textContent=prefs.frequency==='never'?'':greeting;}
+ function selectAnimal(id){selected=id;grid.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.animal===id)));$('pet15PreviewImg').src=path(id);$('pet15PreviewImg').alt=animals.find(a=>a[0]===id)[1];$('pet15PreviewName').textContent=animals.find(a=>a[0]===id)[1]}
+ animals.forEach(([id,name])=>{const b=document.createElement('button');b.type='button';b.className='pet15Animal';b.dataset.animal=id;const img=document.createElement('img');img.src=path(id);img.alt='';img.loading='lazy';const span=document.createElement('span');span.textContent=name;b.append(img,span);b.addEventListener('click',()=>selectAnimal(id));grid.append(b)});
+ function populate(){const x=prefs||defaults();selectAnimal(x.animal);$('pet15Name').value=x.name;$('pet15Personality').value=x.personality;$('pet15Frequency').value=x.frequency;$('pet15Visible').checked=x.visible;status.textContent=''}
+ function open(){if(!currentId){status.textContent='Logga in för att välja djurkompis.';return}populate();panel.hidden=false;panel.scrollIntoView({behavior:'smooth',block:'nearest'})}
+ $('pet15Choose').addEventListener('click',open);
+ $('pet15Later').addEventListener('click',()=>{panel.hidden=true;if(!prefs.seen){prefs.seen=true;cache(currentId,prefs);void syncPrefs(prefs)}});
+ async function syncPrefs(value){if(!navigator.onLine)return false;try{const {error}=await fokusSupabase.auth.updateUser({data:{fokuskompisen_pet15:value}});return !error}catch(_){return false}}
+ $('pet15Save').addEventListener('click',async()=>{if(!currentId||saveBusy)return;saveBusy=true;$('pet15Save').disabled=true;const value=clean({animal:selected,name:$('pet15Name').value.trim(),personality:$('pet15Personality').value,frequency:$('pet15Frequency').value,visible:$('pet15Visible').checked,chosen:true,seen:true});prefs=value;cache(currentId,value);apply();status.textContent='Sparat på den här enheten. Synkroniserar…';const synced=await syncPrefs(value);status.textContent=synced?'Sparat på ditt konto! 💜':'Sparat på den här enheten. Kontosynkronisering kräver internet – försök spara igen när du är online.';saveBusy=false;$('pet15Save').disabled=false;if(synced)setTimeout(()=>{panel.hidden=true},800)});
+ // Ladda kontoinställningar från Supabase Auth user_metadata. Ingen ny databas-tabell behövs.
+ async function loadFor(session){const id=session?.user?.id||null;if(!id){currentId=null;initializedFor=null;prefs=null;panel.hidden=true;return}if(id===initializedFor)return;currentId=id;initializedFor=id;const local=readCache(id);prefs=clean(local);let remote=null;try{if(navigator.onLine){const {data,error}=await fokusSupabase.auth.getUser();if(!error&&data?.user?.id===id)remote=data.user.user_metadata?.fokuskompisen_pet15||null}}catch(_){}if(currentId!==id)return;if(remote){prefs=clean(remote);cache(id,prefs)}apply();if(!prefs.seen){populate();panel.hidden=false}}
+ fokusSupabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){void loadFor(null)}else if(event==='SIGNED_IN'||event==='INITIAL_SESSION'){setTimeout(()=>{void loadFor(session)},0)}});
+ fokusSupabase.auth.getSession().then(({data})=>{if(data?.session)void loadFor(data.session)}).catch(()=>{});
+ // Den befintliga peppknappen behålls. Justera meddelandet efter vald personlighet.
+ window.pet15CustomPepp=()=>{if(!prefs||prefs.frequency==='never')return;const list=messages[prefs.personality];$('pet15Message').textContent=list[msgIndex++%list.length]};
+})();
+</script></body></html>

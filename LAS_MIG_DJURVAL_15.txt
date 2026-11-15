@@ -1,0 +1,7 @@
+Fokuskompisen 1.5 – djurval test
+20 djurbilder i djurkompisar/.
+Välj djur, namn, personlighet, meddelandefrekvens och synlighet på startsidan.
+Inställningar sparas lokalt per konto och synkas till Supabase Auth user_metadata vid sparning online.
+Första gången visas valpanelen, med möjlighet att välja senare.
+Testa med testkonto, inklusive inloggning, utloggning, offline och på annan enhet.
+Obs: Vid offline-sparning krävs ny manuell sparning online för kontosynkronisering.

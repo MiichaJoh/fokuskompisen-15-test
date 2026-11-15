@@ -1,6 +1,6 @@
 // Behåll äldre cacheversioner för att undvika att offline-stöd bryts under uppdatering.
-const CACHE = "fokuskompisen-v15-pet-step1-1";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest"];
+const CACHE = "fokuskompisen-v15-pet-chooser-1";
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./djurkompisar/uggla.webp", "./djurkompisar/rav.webp", "./djurkompisar/varg.webp", "./djurkompisar/katt.webp", "./djurkompisar/kanin.webp", "./djurkompisar/drake.webp", "./djurkompisar/hund.webp", "./djurkompisar/panda.webp", "./djurkompisar/bjorn.webp", "./djurkompisar/enhorning.webp", "./djurkompisar/hast.webp", "./djurkompisar/lejon.webp", "./djurkompisar/tiger.webp", "./djurkompisar/koala.webp", "./djurkompisar/pingvin.webp", "./djurkompisar/igelkott.webp", "./djurkompisar/radjur.webp", "./djurkompisar/fjaril.webp", "./djurkompisar/delfin.webp", "./djurkompisar/elefant.webp"];
 const SUPABASE_SDK = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 self.addEventListener("install", event => event.waitUntil((async () => {
   const cache = await caches.open(CACHE);
