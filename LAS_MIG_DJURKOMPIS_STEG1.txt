@@ -1,0 +1,9 @@
+FOKUSKOMPISEN 1.5 – DJURKOMPIS STEG 1
+
+Testa på startsidan:
+1. Tryck på ”Vad kan du hjälpa mig med?”
+2. Prova Hjälp mig komma igång.
+3. Gå tillbaka till startsidan och prova Ta en paus.
+4. Gå tillbaka och prova Ge mig lite pepp.
+
+Detta är bara första teststeget: ugglan är en emoji-platshållare. De 20 godkända djurbilderna, namn, personlighet, ljud och kontosynk är INTE inbyggda än. Inga befintliga uppgiftsdata ska ändras av den här funktionen.

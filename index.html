@@ -520,6 +520,15 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 .visual-actions15 button{flex:1;min-width:105px}
 .visual-done15 .visual-label15{text-decoration:line-through;opacity:.65}
 </style>
+<style id="pet15Style">
+#pet15Card{border:1px solid #c8b6ea;border-radius:18px;padding:14px;margin:14px 0;background:rgba(194,167,235,.13);color:inherit}
+#pet15Card .pet15Head{display:flex;align-items:center;gap:12px}
+#pet15Card .pet15Avatar{font-size:42px;line-height:1.2;flex-shrink:0}
+#pet15Card .pet15Head p{margin:4px 0}
+#pet15Card .pet15Actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#pet15Card button{min-height:44px}
+#pet15Card[hidden],#pet15Actions[hidden]{display:none!important}
+</style>
 </head>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -585,7 +594,15 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 
 </section>
     
-<section id="homePage" hidden><h2 id="hello">Hej!</h2><p><button type="button" id="calm14Quick" class="calm14Quick">💜 Det är för mycket just nu</button></p><label for="name">Vad vill du bli kallad? (frivilligt)</label><input id="name" placeholder="Ditt namn"><p><strong>Hur mycket energi har du?</strong></p><div id="energy"><button data-energy="low">🪫 Låg</button><button data-energy="medium">🔋 Lagom</button><button data-energy="high">⚡ Hög</button></div><details id="mood12Panel" style="margin:16px 0;padding:14px;border:1px solid #bda9d8;border-radius:12px"><summary><strong>💜 Mitt mående – senaste 7 dagarna</strong></summary><p>Frivilligt. Du väljer själv om du vill spara dagens energi. Tidigare dagar kan raderas.</p><button type="button" id="mood12Save">Spara dagens energi</button><p id="mood12Notice" role="status" aria-live="polite"></p><div id="mood12History"></div></details><label for="feeling">Hur känns dagen? (frivilligt)</label><textarea id="feeling"></textarea><p class="panel" id="message">Du behöver inte göra allt idag.</p>
+<section id="homePage" hidden><h2 id="hello">Hej!</h2><div id="pet15Card" aria-label="Djurkompisen">
+ <div class="pet15Head"><span class="pet15Avatar" role="img" aria-label="Uggla">🦉</span><div><strong>Din djurkompis 💜</strong><p id="pet15Message" aria-live="polite">Hej! Vi tar en sak i taget.</p></div></div>
+ <button type="button" id="pet15Toggle" aria-expanded="false" aria-controls="pet15Actions">🐾 Vad kan du hjälpa mig med?</button>
+ <div id="pet15Actions" class="pet15Actions" hidden>
+ <button type="button" id="pet15Kickoff">🌱 Hjälp mig komma igång</button>
+ <button type="button" id="pet15Pause">☕ Ta en paus</button>
+ <button type="button" id="pet15Encourage">💜 Ge mig lite pepp</button>
+ </div>
+</div><p><button type="button" id="calm14Quick" class="calm14Quick">💜 Det är för mycket just nu</button></p><label for="name">Vad vill du bli kallad? (frivilligt)</label><input id="name" placeholder="Ditt namn"><p><strong>Hur mycket energi har du?</strong></p><div id="energy"><button data-energy="low">🪫 Låg</button><button data-energy="medium">🔋 Lagom</button><button data-energy="high">⚡ Hög</button></div><details id="mood12Panel" style="margin:16px 0;padding:14px;border:1px solid #bda9d8;border-radius:12px"><summary><strong>💜 Mitt mående – senaste 7 dagarna</strong></summary><p>Frivilligt. Du väljer själv om du vill spara dagens energi. Tidigare dagar kan raderas.</p><button type="button" id="mood12Save">Spara dagens energi</button><p id="mood12Notice" role="status" aria-live="polite"></p><div id="mood12History"></div></details><label for="feeling">Hur känns dagen? (frivilligt)</label><textarea id="feeling"></textarea><p class="panel" id="message">Du behöver inte göra allt idag.</p>
 <div id="personalHome">
   <h2>🏠 Min personliga startsida</h2>
   <p>Här kan du se det som är viktigast för dig idag.</p>
@@ -2409,6 +2426,32 @@ body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
  document.getElementById('calm14Pause').addEventListener('click',()=>goCalm14('pause'));
  document.getElementById('calm14One').addEventListener('click',()=>goCalm14('focus11'));
  document.getElementById('calm14Back').addEventListener('click',()=>goCalm14('home'));
+})();
+</script>
+<script id="pet15Script">
+(function(){
+ const card=document.getElementById('pet15Card');
+ const actions=document.getElementById('pet15Actions');
+ const toggle=document.getElementById('pet15Toggle');
+ const message=document.getElementById('pet15Message');
+ if(!card||!actions||!toggle||!message)return;
+ toggle.addEventListener('click',function(){
+  actions.hidden=!actions.hidden;
+  toggle.setAttribute('aria-expanded',String(!actions.hidden));
+ });
+ function navigate(target){
+  // Använd appens befintliga navigeringsknappar och funktioner.
+  const nav=document.querySelector('#mainMenu [data-page="'+target+'"]');
+  if(nav){nav.click();return;}
+  if(typeof showPage==='function')showPage(target);
+ }
+ document.getElementById('pet15Kickoff').addEventListener('click',()=>navigate('kickoff'));
+ document.getElementById('pet15Pause').addEventListener('click',()=>navigate('pause'));
+ const encouragements=['Ett litet steg räcker långt. 💜','Du bestämmer takten. 🐾','Bra att du tar hand om dig själv. 💜','Det är okej att ta en paus. 🌿'];
+ let next=0;
+ document.getElementById('pet15Encourage').addEventListener('click',function(){
+  message.textContent=encouragements[next%encouragements.length];next++;
+ });
 })();
 </script>
 </body></html>
