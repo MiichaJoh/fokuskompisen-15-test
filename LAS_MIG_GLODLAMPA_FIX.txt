@@ -1,0 +1,1 @@
+Testversion: konkret, säker steg-för-steg-hjälp för "Byta glödlampa". Övriga regler och funktioner bevarade. Testa i test-repot, inte i huvudversionen.
