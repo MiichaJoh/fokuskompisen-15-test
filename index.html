@@ -2361,15 +2361,100 @@ if (backupPickerLabel) backupPickerLabel.addEventListener('keydown', event => {
   const key=()=> 'fokuskompisen15-kickoff-multi:'+owner;
   const legacy=()=> 'fokuskompisen09-kickoff:'+owner;
   const uid=()=>crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
+  // Uppgiftsspecifika mikrosteg. Inga generella utfyllnadsråd i Extra små steg.
+  const detailedPlans = [
+    [/städa.*kök|rengöra.*köksbänk/i, [
+      'Ta fram en soppåse eller öppna sopkärlet.',
+      'Titta på köksbänken och välj en sak som är skräp.',
+      'Plocka upp just den saken.',
+      'Lägg skräpet i soporna.',
+      'Välj en sak på bänken som hör hemma någon annanstans.',
+      'Lägg den saken på sin plats.',
+      'Ta fram en trasa som passar köksbänken.',
+      'Torka av en liten fri yta.',
+      'Välj själv om du vill fortsätta med nästa lilla yta.'
+    ]],
+    [/städa.*sovrum|städa.*rum|plocka undan/i, [
+      'Ta fram en påse för skräp.', 'Titta efter en sak som ska slängas.',
+      'Plocka upp saken.', 'Lägg den i påsen.',
+      'Titta efter ett smutsigt klädesplagg.', 'Lägg plagget i tvättkorgen.',
+      'Välj en sak som ligger framme.', 'Lägg den på sin plats eller åt sidan.',
+      'Välj själv om du vill fortsätta med en sak till.'
+    ]],
+    [/diska|disk(?:en|$|\s)/i, [
+      'Gå till diskhon.', 'Välj en kopp eller tallrik.',
+      'Ställ den vid diskhon.', 'Ta fram diskborste eller svamp om du handdiskar.',
+      'Diska den valda saken, eller ställ den i diskmaskinen.',
+      'Ställ undan den rena saken om den är färdig.',
+      'Välj själv om du vill ta en sak till.'
+    ]],
+    [/dammsug/i, [
+      'Ta fram dammsugaren.', 'Kontrollera att sladden och munstycket ser hela ut.',
+      'Flytta undan en sak från golvet.', 'Sätt i kontakten om det behövs.',
+      'Starta dammsugaren.', 'Dammsug en liten bit av golvet.',
+      'Stäng av dammsugaren innan du flyttar undan fler saker.'
+    ]],
+    [/packa.*skolväska|skolväska/i, [
+      'Ta fram skolväskan.', 'Öppna väskan.',
+      'Titta på morgondagens schema eller information från skolan.',
+      'Välj en sak som behövs.', 'Lägg saken i väskan.',
+      'Kontrollera om ytterligare en sak behövs.', 'Stäng väskan när du är nöjd.'
+    ]],
+    [/tvätta.*kläder|starta.*tvättmaskin|köra.*tvätt/i, [
+      'Ta fram ett plagg som behöver tvättas.', 'Läs tvättrådet på plagget.',
+      'Lägg plagget i en lämplig tvätthög.', 'Välj fler plagg som kan tvättas tillsammans.',
+      'Lägg en lagom mängd i maskinen.', 'Tillsätt tvättmedel enligt förpackningen.',
+      'Välj ett program som passar tvättråden.', 'Starta maskinen.'
+    ]],
+    [/byta.*sängkläder|byta.*lakan|rena lakan/i, [
+      'Ta fram ett rent örngott.', 'Ta av ett använt örngott.',
+      'Lägg det använda örngottet i tvätten.', 'Sätt på det rena örngottet.',
+      'Ta fram ett rent lakan.', 'Ta bort det använda lakanet.',
+      'Lägg på det rena lakanet.', 'Byt påslakan om det behövs.'
+    ]],
+    [/skriva.*inköpslista|göra.*inköpslista/i, [
+      'Ta fram papper eller öppna en anteckning.', 'Titta efter en vara som saknas.',
+      'Skriv namnet på varan.', 'Titta efter en vara till.',
+      'Skriv den om du behöver den.', 'Spara listan där du hittar den.'
+    ]],
+    [/duscha|ta.*dusch/i, [
+      'Ta fram en handduk.', 'Lägg fram rena kläder om du vill.',
+      'Gå till duschen.', 'Sätt på vattnet.',
+      'Känn efter att temperaturen är behaglig.', 'Tvätta dig i din takt.',
+      'Stäng av vattnet.', 'Torka dig med handduken.'
+    ]],
+    [/mata.*hund|mata.*katt|mata.*husdjur/i, [
+      'Ta fram djurets matskål.', 'Kontrollera vilken mat djuret ska ha.',
+      'Kontrollera lämplig mängd.', 'Lägg maten i skålen.',
+      'Ställ skålen på djurets matplats.', 'Kontrollera att djuret har färskt vatten.'
+    ]],
+    [/laga.*frukost|göra.*frukost/i, [
+      'Välj vad du vill äta till frukost.', 'Tvätta händerna.',
+      'Ta fram en ingrediens.', 'Ta fram en tallrik eller skål.',
+      'Gör i ordning en del av frukosten.', 'Gör klart maten i din takt.',
+      'Sätt dig och ät när du är redo.'
+    ]],
+    [/betala.*räkning|betala.*faktura/i, [
+      'Ta fram räkningen.', 'Kontrollera förfallodatumet.',
+      'Kontrollera beloppet.', 'Kontrollera mottagaren.',
+      'Öppna din bank på ett säkert sätt.', 'Jämför betalningsuppgifterna med räkningen.',
+      'Godkänn bara betalningen om allt stämmer.'
+    ]]
+  ];
   function stepsFor(task,level){
     const base=makeSteps(task).steps;
-    if(level==='normal')return base;
-    if(level==='small')return ['Välj en lugn plats att börja på.',...base,'Titta efter om något mer behöver göras. Du bestämmer när det räcker.'];
-    return ['Fundera på vilken liten del du vill börja med.','Stanna upp och känn efter vad du behöver.',
-      'Ta fram en sak som kan hjälpa dig att börja.',base[0],
-      'Du kan pausa här om du vill.',base[1],
-      'Ta en kort stund och se vad som återstår.',base[2],
-      'Kontrollera om du vill fortsätta eller avsluta.'];
+    if(level==='normal')return base.slice();
+    const detailed=detailedPlans.find(([pattern])=>pattern.test(task));
+    if(detailed){
+      const extra=detailed[1].slice();
+      if(level==='extra')return extra;
+      // Små steg: kortare men fortfarande konkreta och relevanta för uppgiften.
+      const positions=[0,Math.floor((extra.length-1)/3),Math.floor(2*(extra.length-1)/3),extra.length-1];
+      return [...new Set(positions)].map(i=>extra[i]);
+    }
+    // Övriga vardagsuppgifter: använd de uppgiftsspecifika biblioteksstegen
+    // i stället för abstrakta utfyllnadsinstruktioner.
+    return base.slice();
   }
   function sync(){
     const id=activeUserId||null;if(id===owner)return;owner=id;data={level:'small',items:[],selected:null};input.value='';

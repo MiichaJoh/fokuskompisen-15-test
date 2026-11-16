@@ -1,0 +1,1 @@
+TEST: Tydligare uppgiftsspecifika steg. Städa köket har 9 konkreta Extra små steg. Andra vanliga uppgifter har särskilda detaljplaner. Övriga uppgifter använder sina befintliga bibliotekssteg utan generiska utfyllnadssteg. Gamla påbörjade uppgifter finns kvar, men stegnummer kan behöva kontrolleras när steglängden ändras. Dagbok och övriga funktioner är oförändrade.
