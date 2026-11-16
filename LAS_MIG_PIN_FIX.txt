@@ -1,0 +1,3 @@
+Fokuskompisen 1.5 TEST – PIN-fix
+PIN-rutan döljs när krypterad dagbok är upplåst. Dagboken låses när användaren lämnar sidan. Befintliga dagboksdata ändras inte.
+Testa med rätt och fel PIN, samt växling till annan sida och tillbaka.
