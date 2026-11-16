@@ -581,6 +581,7 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 <details class="menuGroup13"><summary>💜 Mående och framsteg</summary>
 <button type="button" data-page="progress">Mina framsteg</button>
 <button type="button" data-page="wins13">Mina små segrar</button>
+<button type="button" data-page="diary15">📔 Min dagbok</button>
 <button type="button" data-page="pause">Pauskompis</button>
 </details>
 <details class="menuGroup13"><summary>🌷 Övrigt och inställningar</summary>
@@ -707,17 +708,22 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 <h2 id="kickoffHeading">🌱 Hjälp mig komma igång</h2>
 <p>En liten sak i taget. Du bestämmer när det räcker.</p>
 <p class="small">Gratis stöd med färdiga förslag, utan AI. Fungerar offline när appen har laddats på enheten.</p>
+<label for="kickoffLevel15">Hur små steg vill du ha?</label><select id="kickoffLevel15"><option value="normal">Vanliga steg</option><option value="small" selected>Små steg</option><option value="extra">Extra små steg</option></select>
 <form id="kickoffForm"><label for="kickoffInput">Vad vill du ha hjälp att börja med?</label>
 <textarea id="kickoffInput" maxlength="300" required placeholder="Till exempel: Städa sovrummet" aria-describedby="kickoffHint"></textarea>
 <p id="kickoffHint" class="small">Förslagen är enkla och kan behöva anpassas. Skriv gärna en uppgift i taget.</p>
 <button type="submit">Visa ett litet första steg</button></form>
+<div id="kickoffSaved15" class="panel"><h3>⏸️ Mina påbörjade uppgifter</h3><div id="kickoffSavedList15"></div></div>
 <div id="kickoffResult" hidden class="panel" style="color:#30263b" role="status" aria-live="polite" aria-atomic="true">
 <p id="kickoffTask" style="overflow-wrap:anywhere"></p><p id="kickoffProgress" class="small"></p><p id="kickoffStep" style="font-size:1.15em"></p>
 </div><div id="kickoffActions" hidden class="actions">
-<button type="button" id="kickoffNext">Nästa steg</button><button type="button" id="kickoffPause" class="alt">Ta paus</button><button type="button" id="kickoffDone" class="alt">Jag är klar</button></div>
+<button type="button" id="kickoffBack15" class="alt">Föregående steg</button><button type="button" id="kickoffNext">Nästa steg</button><button type="button" id="kickoffPause" class="alt">Ta paus</button><button type="button" id="kickoffDone" class="alt">Jag är klar</button><button type="button" id="kickoffDelete15" class="alt">Ta bort</button></div>
 <p id="kickoffStorage" class="small" role="status"></p>
-<p class="small">Påbörjad hjälp sparas bara för ditt konto i den här webbläsaren. Den ingår inte i säkerhetskopian och ändrar inte dina uppgifter eller rutiner.</p>
+<p class="small">Påbörjade uppgifter sparas lokalt per konto, även offline. De ingår inte i den vanliga JSON-säkerhetskopian. Exportera gärna viktiga uppgifter separat.</p>
 </section>
+<section id="diary15Page" hidden><h2>📔 Min dagbok</h2><p>En privat plats för dina tankar. Både känsla och text är frivilliga. Inläggen sparas bara på den här enheten och synkroniseras inte.</p>
+<div id="diaryLock15" class="panel"><p id="diaryLockInfo15">Lås upp din dagbok om du har valt PIN.</p><label for="diaryPin15">PIN-kod (minst 6 siffror)</label><input id="diaryPin15" type="password" inputmode="numeric" autocomplete="off" maxlength="12"><div class="actions"><button type="button" id="diaryUnlock15">Lås upp</button><button type="button" id="diarySetPin15" class="alt">Aktivera PIN och kryptering</button></div><p id="diaryLockStatus15" role="status"></p></div>
+<div id="diaryContent15" hidden><p class="small" id="diarySecurity15"></p><label for="diaryDate15">Datum</label><input id="diaryDate15" type="date"><label for="diaryMood15">Hur känns dagen?</label><select id="diaryMood15"><option value="">Vill inte välja</option><option>😊 Glad</option><option>🙂 Okej</option><option>😴 Trött</option><option>😢 Ledsen</option><option>😣 Stressad</option><option>🌿 Lugn</option></select><label for="diaryText15">Vill du skriva något?</label><textarea id="diaryText15" maxlength="10000" rows="5" placeholder="Idag har jag..."></textarea><div class="actions"><button type="button" id="diarySave15">Spara inlägg</button><button type="button" id="diaryNew15" class="alt">Nytt inlägg</button><button type="button" id="diarySupport15" class="alt">🦊 Ge mig stöd</button></div><p id="diarySupportText15" aria-live="polite"></p><p id="diaryStatus15" role="status"></p><h3>Mina tidigare dagar</h3><label for="diaryView15">Visa som</label><select id="diaryView15"><option value="list">Lista</option><option value="calendar">Kalender</option></select><div id="diaryEntries15"></div><h3>🔒 Skydd och säkerhetskopia</h3><p class="small">PIN skyddar dagbokens krypterade data på enheten. En kort PIN ger svagare skydd än ett långt lösenord. Glömmer du PIN kan inläggen inte återställas utan en säkerhetskopia.</p><div class="actions"><button type="button" id="diaryLockNow15" class="alt">Lås dagboken</button><button type="button" id="diaryExport15" class="alt">Exportera krypterad säkerhetskopia</button><label class="alt" for="diaryImport15" style="padding:10px">Importera säkerhetskopia</label><input type="file" id="diaryImport15" accept=".json,application/json"></div><p class="small">Säkerhetskopior skyddas med ett separat lösenord. Vid import läggs inlägg till utan dubbletter.</p></div></section>
 <section id="stepsPage"><h2>👣 Små steg</h2><label for="choose">Välj en uppgift</label><select id="choose"></select><div id="steps" class="panel">Välj en uppgift för att få hjälp med små steg.</div></section>
 <section id="pausePage"><h2>☕ Pauskompis</h2><p>En paus är också viktig. Starta en paus på 20 minuter när du vill.</p><div id="clock">20:00</div><button id="start">Starta paus</button><button class="alt" id="stop">Stoppa och återställ</button><p id="pause" class="panel">Du bestämmer när du är redo igen.</p></section>
 <section id="backupPage"><h2>💾 Säkerhetskopia</h2><p>Exportera dina uppgifter till en JSON-fil innan du uppdaterar eller byter mobil. Förvara filen privat – den kan innehålla personliga uppgifter.</p><div class="actions"><button type="button" id="export">Ladda ner säkerhetskopia</button><label for="import" class="alt" tabindex="0" style="display:inline-block;padding:10px;border-radius:9px;cursor:pointer">Välj säkerhetskopia</label><input type="file" id="import" accept=".json,application/json" style="max-width:240px"></div><p class="notice warning">Import ersätter uppgifterna på det inloggade kontot efter synkronisering. Exportera gärna en kopia först. Du får bekräfta innan något ändras.</p><p id="status" role="status"></p><div class="panel" id="syncPanel"><h3>☁️ Mina uppgifter på mitt konto</h3><p id="syncStatus" role="status" aria-live="polite">Kontrollerar synkronisering…</p><button type="button" id="migrateTasks" hidden>📥 Kopiera mina tidigare uppgifter till kontot</button><p class="small">Dina tidigare lokala uppgifter raderas inte. Behåll din JSON-säkerhetskopia.</p></div></section>
@@ -822,7 +828,7 @@ body[data-theme="dark"] .calm14Choices button:focus-visible,body[data-theme="dar
 <h3>💜 Mer hjälp</h3>
 <p><button type="button" id="helpOpenWelcome10">Visa välkomstguiden igen</button></p>
 <p class="small">Kontakt och feedback: en officiell kontaktväg läggs till inför lanseringen.</p>
-</section></main><footer>Fokuskompisen 1.0 DESIGNTEST 💜 · Sparar lokalt på enheten · Säkerhetskopiera regelbundet · Fungerar utan internet</footer>
+</section></main><footer>Fokuskompisen 1.5 TEST 💜 · Sparar lokalt på enheten · Säkerhetskopiera regelbundet · Fungerar utan internet</footer>
 <script> const menuButton = document.getElementById("menuButton");
 const mainMenu = document.getElementById("mainMenu");
 const pages = {
@@ -836,6 +842,7 @@ const pages = {
   week: "weekPage",
   steps: "stepsPage",
   kickoff: "kickoffPage",
+  diary15: "diary15Page",
   pause: "pausePage",
   ideas: "ideasPage",
   progress: "progressPage",
@@ -1422,6 +1429,7 @@ updateHomeReminders();
       toggle.textContent=stepPanel.hidden?"👣 Visa små steg":"👣 Dölj små steg";
     };
     div.append(stepPanel);
+    const kickoffButton=document.createElement("button");kickoffButton.type="button";kickoffButton.className="alt";kickoffButton.textContent="🌱 Hjälp mig komma igång";kickoffButton.onclick=()=>window.fokusKickoffOpen15?.(t.name);div.append(kickoffButton);
     groupContent.append(div);
   });
   });
@@ -1430,6 +1438,7 @@ updateHomeReminders();
     const items=state.tasks.filter(t=>!t.done&&t.priority===k&&(!t.date||dueOn(t,dateKey())||(t.repeat==="none"&&t.date<dateKey())));
     const div=document.createElement("div");div.className="panel";
     div.innerHTML="<strong>"+label+"</strong>"+(items.length?"<ul>"+items.map(t=>"<li>"+esc(t.name)+"</li>").join("")+"</ul>":"<p>Inget här just nu.</p>");
+    div.querySelectorAll("li").forEach(li=>{const b=document.createElement("button");b.type="button";b.className="alt";b.textContent="🌱 Små steg";b.onclick=()=>window.fokusKickoffOpen15?.(li.firstChild.textContent);li.append(" ",b);});
     $("daily").append(div)
   });
   $("week").innerHTML="";
@@ -1437,6 +1446,7 @@ updateHomeReminders();
     const d=new Date();d.setDate(d.getDate()+i);const day=dateKey(d),items=state.tasks.filter(t=>dueOn(t,day));
     const div=document.createElement("div");div.className="panel";
     div.innerHTML="<strong>"+(i===0?"Idag":esc(d.toLocaleDateString("sv-SE",{weekday:"long"})))+"</strong><p class='small'>"+esc(d.toLocaleDateString("sv-SE",{day:"numeric",month:"short"}))+"</p>"+(items.length?"<ul>"+items.map(t=>"<li>"+esc(t.name)+"</li>").join("")+"</ul>":"<p class='small'>Inget planerat</p>");
+    div.querySelectorAll("li").forEach(li=>{const b=document.createElement("button");b.type="button";b.className="alt";b.textContent="🌱 Små steg";b.onclick=()=>window.fokusKickoffOpen15?.(li.firstChild.textContent);li.append(" ",b);});
     $("week").append(div);
   }
   const old=$("choose").value;
@@ -1708,6 +1718,7 @@ function renderRoutines09(){
      });
      const span=document.createElement("span");span.textContent=step.text;label.append(input,span);visual09Decorate(span,step.text);article.append(label);
    }
+   const kickoffRoutine=document.createElement("button");kickoffRoutine.type="button";kickoffRoutine.className="alt";kickoffRoutine.textContent="🌱 Hjälp mig komma igång";kickoffRoutine.onclick=()=>window.fokusKickoffOpen15?.(routine.name);article.append(kickoffRoutine);
    const actions=document.createElement("div");actions.className="actions";
    const edit=document.createElement("button");edit.type="button";edit.className="alt";edit.textContent="✏️ Redigera";
    edit.addEventListener("click",()=>{
@@ -2345,52 +2356,53 @@ if (backupPickerLabel) backupPickerLabel.addEventListener('keydown', event => {
       'Prova den lilla delen en kort stund. Du får stanna när du vill.'
     ]};
   }
-  let owner = null, draft = {};
-  const key = () => 'fokuskompisen09-kickoff:' + owner;
-  function syncOwner() {
-    const id = activeUserId || null;
-    if (owner === id) return;
-    owner = id; draft = {}; input.value = '';
-    if (owner) try {
-      const saved = JSON.parse(localStorage.getItem(key()) || '{}');
-      if (typeof saved.text === 'string') draft.text = saved.text.slice(0,300);
-      if (typeof saved.task === 'string' && ['active','paused','done'].includes(saved.mode)) {
-        draft.task=saved.task.slice(0,300); draft.mode=saved.mode;
-        draft.index=Number.isInteger(saved.index) ? Math.max(0,Math.min(2,saved.index)) : 0;
-      }
-    } catch (_) { el('kickoffStorage').textContent='Kunde inte läsa tidigare hjälp. Du kan börja på nytt.'; }
-    input.value = draft.text || '';
+  // 1.5: flera parallella planer i egen kontobunden nyckel. Ursprunglig nyckel läses enbart för migration.
+  let owner=null, data={level:'small',items:[],selected:null};
+  const key=()=> 'fokuskompisen15-kickoff-multi:'+owner;
+  const legacy=()=> 'fokuskompisen09-kickoff:'+owner;
+  const uid=()=>crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
+  function stepsFor(task,level){
+    const base=makeSteps(task).steps;
+    if(level==='normal')return base;
+    if(level==='small')return ['Välj en lugn plats att börja på.',...base,'Titta efter om något mer behöver göras. Du bestämmer när det räcker.'];
+    return ['Fundera på vilken liten del du vill börja med.','Stanna upp och känn efter vad du behöver.',
+      'Ta fram en sak som kan hjälpa dig att börja.',base[0],
+      'Du kan pausa här om du vill.',base[1],
+      'Ta en kort stund och se vad som återstår.',base[2],
+      'Kontrollera om du vill fortsätta eller avsluta.'];
   }
-  function persist() {
-    if (!owner) return;
-    try { localStorage.setItem(key(),JSON.stringify(draft)); el('kickoffStorage').textContent=''; }
-    catch (_) { el('kickoffStorage').textContent='Kunde inte spara på enheten. Låt sidan vara öppen om du vill behålla hjälpen.'; }
+  function sync(){
+    const id=activeUserId||null;if(id===owner)return;owner=id;data={level:'small',items:[],selected:null};input.value='';
+    if(!id)return;
+    try{const raw=JSON.parse(localStorage.getItem(key())||'null');if(raw&&Array.isArray(raw.items))data={level:['normal','small','extra'].includes(raw.level)?raw.level:'small',items:raw.items.filter(x=>x&&typeof x.task==='string').slice(0,100),selected:raw.selected||null};
+      else {const old=JSON.parse(localStorage.getItem(legacy())||'null');if(old?.task){const item={id:uid(),task:String(old.task).slice(0,300),level:'small',index:Math.max(0,Math.min(2,old.index||0)),mode:old.mode==='done'?'done':old.mode==='paused'?'paused':'active',created:Date.now()};data.items=[item];data.selected=item.id;}}
+    }catch(e){el('kickoffStorage').textContent='Kunde inte läsa sparade planer.';}
+    el('kickoffLevel15').value=data.level;
   }
-  function render() {
-    syncOwner();
-    const exists=Boolean(draft.task), done=draft.mode==='done', paused=draft.mode==='paused';
-    el('kickoffResult').hidden=!exists; el('kickoffActions').hidden=!exists || done;
-    if (!exists) return;
-    const plan=makeSteps(draft.task), index=draft.index || 0;
-    el('kickoffTask').textContent=draft.task;
-    el('kickoffProgress').textContent=done ? 'Avslutat för nu' : 'Steg '+(index+1)+' av '+plan.steps.length+(plan.known?'':' · Allmänt förslag');
-    el('kickoffStep').textContent=done ? 'Du har valt att avsluta för nu. Det du gjort får räcka. Du kan börja igen när du vill.' : paused ? 'Ta den tid du behöver. Ditt steg finns kvar när du vill fortsätta.' : plan.steps[index];
-    if(!done && !paused) visual09Decorate(el('kickoffStep'),plan.steps[index]);
-    el('kickoffNext').hidden=!paused && index===plan.steps.length-1;
-    el('kickoffNext').textContent=paused?'Fortsätt med samma steg':'Nästa steg';
-    el('kickoffPause').hidden=paused;
+  function persist(){if(!owner)return;try{localStorage.setItem(key(),JSON.stringify(data));el('kickoffStorage').textContent='Framstegen är sparade på enheten.';}catch(e){el('kickoffStorage').textContent='Kunde inte spara! Kontrollera ledigt utrymme.';}}
+  function current(){return data.items.find(x=>x.id===data.selected);}
+  function render(){sync();const item=current();const exists=!!item,done=item?.mode==='done',paused=item?.mode==='paused';
+    el('kickoffResult').hidden=!exists;el('kickoffActions').hidden=!exists||done;
+    const list=el('kickoffSavedList15');list.replaceChildren();
+    for(const x of data.items.filter(x=>x.mode!=='done')){const b=document.createElement('button');b.type='button';b.className='alt';b.style.margin='4px';const total=stepsFor(x.task,x.level).length;b.textContent=(x.id===data.selected?'▶ ':'')+x.task+' · '+(x.index+1)+'/'+total+(x.mode==='paused'?' · Pausad':'');b.onclick=()=>{data.selected=x.id;persist();render();};list.append(b);}
+    if(!list.childNodes.length)list.textContent='Inga påbörjade uppgifter ännu.';
+    if(!exists)return;
+    const plan=stepsFor(item.task,item.level);item.index=Math.max(0,Math.min(plan.length-1,item.index||0));
+    el('kickoffTask').textContent=item.task;el('kickoffProgress').textContent=(done?'Avslutad · ':paused?'Pausad · ':'')+'Steg '+(item.index+1)+' av '+plan.length+' · '+({normal:'Vanliga steg',small:'Små steg',extra:'Extra små steg'}[item.level]);
+    el('kickoffStep').textContent=done?'Du bestämmer själv när det räcker. Bra att du tog hand om dig!':paused?'Ta den tid du behöver. Tryck Fortsätt när du vill.':plan[item.index];
+    if(!done&&!paused)visual09Decorate(el('kickoffStep'),plan[item.index]);
+    el('kickoffNext').hidden=!paused&&item.index===plan.length-1;el('kickoffNext').textContent=paused?'Fortsätt med samma steg':'Nästa steg';el('kickoffPause').hidden=paused;el('kickoffBack15').hidden=paused||item.index===0;
+    el('kickoffLevel15').value=item.level;
   }
-  input.addEventListener('input',()=>{syncOwner(); draft.text=input.value; input.setCustomValidity(''); persist();});
-  el('kickoffForm').addEventListener('submit',event=>{
-    event.preventDefault(); syncOwner(); const text=input.value.trim();
-    if (!text) { input.setCustomValidity('Skriv vad du vill ha hjälp med.'); input.reportValidity(); return; }
-    draft={text:input.value,task:text,index:0,mode:'active'};persist();render();
-  });
-  el('kickoffNext').onclick=()=>{syncOwner(); if(!draft.task)return; if(draft.mode==='paused')draft.mode='active';else draft.index=Math.min(2,(draft.index||0)+1);persist();render();};
-  el('kickoffPause').onclick=()=>{syncOwner();if(!draft.task)return;draft.mode='paused';persist();render();};
-  el('kickoffDone').onclick=()=>{syncOwner();if(!draft.task)return;draft.mode='done';persist();render();};
-  new MutationObserver(()=>{if(!page.hidden)render();}).observe(page,{attributes:true,attributeFilter:['hidden']});
-  render();
+  el('kickoffLevel15').addEventListener('change',e=>{sync();data.level=e.target.value;const item=current();if(item&&item.mode!=='done'){const old=stepsFor(item.task,item.level).length;const next=stepsFor(item.task,data.level).length;item.index=Math.min(next-1,Math.round(item.index/Math.max(1,old-1)*(next-1)));item.level=data.level;}persist();render();});
+  el('kickoffForm').addEventListener('submit',e=>{e.preventDefault();sync();const task=input.value.trim();if(!task)return;if(!owner){el('kickoffStorage').textContent='Logga in först.';return;}const item={id:uid(),task,level:data.level,index:0,mode:'active',created:Date.now()};data.items.unshift(item);data.items=data.items.slice(0,100);data.selected=item.id;input.value='';persist();render();});
+  el('kickoffNext').onclick=()=>{sync();const x=current();if(!x)return;if(x.mode==='paused')x.mode='active';else x.index=Math.min(stepsFor(x.task,x.level).length-1,x.index+1);persist();render();};
+  el('kickoffBack15').onclick=()=>{sync();const x=current();if(x){x.index=Math.max(0,x.index-1);persist();render();}};
+  el('kickoffPause').onclick=()=>{sync();const x=current();if(x){x.mode='paused';persist();render();}};
+  el('kickoffDone').onclick=()=>{sync();const x=current();if(x){x.mode='done';persist();render();}};
+  el('kickoffDelete15').onclick=()=>{sync();const x=current();if(x&&confirm('Vill du ta bort den påbörjade uppgiften ”'+x.task+'”?')){data.items=data.items.filter(y=>y.id!==x.id);data.selected=data.items[0]?.id||null;persist();render();}};
+  window.fokusKickoffOpen15=task=>{sync();if(!owner)return;input.value=String(task||'').slice(0,300);document.querySelector('#mainMenu [data-page="kickoff"]')?.click();input.focus();};
+  new MutationObserver(()=>{if(!page.hidden)render();}).observe(page,{attributes:true,attributeFilter:['hidden']});render();
 })();
 
 </script><div id="welcomeGuideOverlay" hidden>
@@ -2597,4 +2609,42 @@ body[data-theme="dark"] #mainMenu #deleteAccountButton{color:#ffb8bf !important}
  // Den befintliga peppknappen behålls. Justera meddelandet efter vald personlighet.
  window.pet15CustomPepp=peppMessage;
 })();
-</script></body></html>
+</script><script id="diary15-script">
+(()=>{'use strict';
+const $=id=>document.getElementById(id), enc=new TextEncoder(),dec=new TextDecoder();
+let owner=null,items=[],pin=null,locked=false,selected=null,loading=false;
+const key=id=>'fokuskompisen15-diary:'+id;
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+const un64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
+async function derive(password,salt){const base=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
+async function encrypt(obj,password){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),k=await derive(password,salt);return {v:1,salt:b64(salt),iv:b64(iv),cipher:b64(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,enc.encode(JSON.stringify(obj))))};}
+async function decrypt(blob,password){const k=await derive(password,un64(blob.salt));return JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:un64(blob.iv)},k,un64(blob.cipher))));}
+function valid(x){return Array.isArray(x)?x.filter(e=>e&&typeof e.id==='string'&&typeof e.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&typeof e.text==='string'&&e.text.length<=10000&&typeof e.mood==='string').slice(0,5000):[];}
+function status(s){$('diaryStatus15').textContent=s;}
+function sync(){const id=typeof activeUserId==='undefined'?null:activeUserId;if(id===owner)return;owner=id;items=[];pin=null;selected=null;locked=false;let raw=null;try{raw=id?JSON.parse(localStorage.getItem(key(id))||'null'):null;}catch(e){}if(raw?.encrypted){locked=true;}else if(raw?.entries){items=valid(raw.entries);}paintLock();draw();}
+function paintLock(){const raw=owner?JSON.parse(localStorage.getItem(key(owner))||'null'):null;const encrypted=!!raw?.encrypted;$('diaryLock15').hidden=false;$('diaryContent15').hidden=!owner||locked;$('diarySetPin15').hidden=encrypted;$('diaryUnlock15').hidden=!encrypted;$('diaryLockInfo15').textContent=encrypted?'Ange din PIN för att låsa upp dagboken.':'Vill du skydda dagboken med en PIN-kod?';$('diarySecurity15').textContent=encrypted?'🔒 Dagboken är krypterad med din PIN.':'⚠️ Dagboken sparas okrypterad på den här enheten tills du aktiverar PIN.';}
+async function persist(){if(!owner||locked)return false;try{const raw=pin?{encrypted:await encrypt(items,pin)}:{entries:items};localStorage.setItem(key(owner),JSON.stringify(raw));return true;}catch(e){status('Kunde inte spara dagboken. Kontrollera enhetens lagringsutrymme.');return false;}}
+function dateToday(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
+function newEntry(){$('diaryDate15').value=dateToday();$('diaryMood15').value='';$('diaryText15').value='';selected=null;}
+function editEntry(e){selected=e.id;$('diaryDate15').value=e.date;$('diaryMood15').value=e.mood;$('diaryText15').value=e.text;status('Redigerar ett tidigare inlägg.');}
+function draw(){if(!owner||locked)return;const host=$('diaryEntries15');host.replaceChildren();const ordered=[...items].sort((a,b)=>b.date.localeCompare(a.date)||b.created-a.created);
+ if($('diaryView15').value==='calendar'){
+ const month=document.createElement('input');month.type='month';month.value=($('diaryDate15').value||dateToday()).slice(0,7);host.append(month);
+ const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:12px 0';host.append(grid);
+ const paint=()=>{grid.replaceChildren();const [y,m]=month.value.split('-').map(Number);if(!y||!m)return;const offset=(new Date(y,m-1,1).getDay()+6)%7;const count=new Date(y,m,0).getDate();for(let i=0;i<offset;i++)grid.append(document.createElement('span'));for(let d=1;d<=count;d++){const date=month.value+'-'+String(d).padStart(2,'0');const matches=ordered.filter(x=>x.date===date);const b=document.createElement('button');b.type='button';b.className='alt';b.style.cssText='padding:6px 2px;min-width:0';b.textContent=d+(matches.length?' 💜':'');b.title=matches.length?matches.length+' inlägg':'Inga inlägg';b.onclick=()=>{if(matches[0])editEntry(matches[0]);else{$('diaryDate15').value=date;selected=null;$('diaryMood15').value='';$('diaryText15').value='';}};grid.append(b);}};month.onchange=paint;paint();}
+ if(!ordered.length){const p=document.createElement('p');p.textContent='Du har inga dagboksinlägg ännu.';host.append(p);return;}
+ for(const e of ordered){const card=document.createElement('div');card.className='panel';const h=document.createElement('strong');h.textContent=e.date+' '+e.mood;const txt=document.createElement('p');txt.textContent=e.text.slice(0,180)+(e.text.length>180?'…':'');const edit=document.createElement('button');edit.type='button';edit.textContent='Redigera';edit.className='alt';edit.onclick=()=>editEntry(e);const del=document.createElement('button');del.type='button';del.textContent='Ta bort';del.className='alt';del.onclick=async()=>{if(confirm('Vill du radera det här dagboksinlägget?')){items=items.filter(x=>x.id!==e.id);if(selected===e.id)newEntry();await persist();draw();}};card.append(h,txt,edit,del);host.append(card);}}
+$('diarySave15').onclick=async()=>{sync();if(locked||!owner)return;const date=$('diaryDate15').value,mood=$('diaryMood15').value,text=$('diaryText15').value.trim();if(!date||(!mood&&!text)){status('Välj en känsla eller skriv något för att spara.');return;}if(selected){const e=items.find(x=>x.id===selected);if(e)Object.assign(e,{date,mood,text});}else{selected=uid();items.push({id:selected,date,mood,text,created:Date.now()});}if(await persist()){status('Dagboksinlägget är sparat på den här enheten. 💜');draw();}};
+$('diaryNew15').onclick=()=>{newEntry();status('Du kan skriva ett nytt inlägg.');};
+$('diaryView15').onchange=draw;
+$('diarySupport15').onclick=()=>{const mood=$('diaryMood15').value;const msg=mood.includes('Ledsen')?'Du behöver inte ha en bra dag varje dag. 💜':mood.includes('Stressad')?'Några ord räcker, om du vill. 💜':mood.includes('Glad')?'Vad fint att du vill spara en glad stund! 🌸':'Du bestämmer själv vad du vill skriva. Ett litet steg i taget. 💜';$('diarySupportText15').textContent=msg;};
+$('diarySetPin15').onclick=async()=>{sync();if(!owner||locked)return;const value=$('diaryPin15').value;if(!/^\d{6,12}$/.test(value)){$('diaryLockStatus15').textContent='Använd 6–12 siffror.';return;}if(!confirm('Om du glömmer din PIN kan dagboken inte låsas upp. Vill du aktivera kryptering?'))return;pin=value;if(await persist()){$('diaryPin15').value='';paintLock();status('PIN och kryptering är aktiverade.');}};
+$('diaryUnlock15').onclick=async()=>{sync();const value=$('diaryPin15').value;try{const raw=JSON.parse(localStorage.getItem(key(owner)));items=valid(await decrypt(raw.encrypted,value));pin=value;locked=false;$('diaryPin15').value='';$('diaryLockStatus15').textContent='';paintLock();draw();}catch(e){$('diaryLockStatus15').textContent='Fel PIN eller skadade data.';}};
+$('diaryLockNow15').onclick=()=>{if(!pin){status('Aktivera PIN om du vill kunna låsa dagboken.');return;}items=[];pin=null;locked=true;paintLock();};
+$('diaryExport15').onclick=async()=>{sync();if(locked)return;const pass=prompt('Välj ett SEPARAT lösenord för säkerhetskopian (minst 10 tecken). Det behövs för återställning.');if(pass===null)return;if(pass.length<10){status('Lösenordet måste ha minst 10 tecken.');return;}try{const payload={app:'Fokuskompisen-diary15',version:1,encrypted:await encrypt(items,pass)};const url=URL.createObjectURL(new Blob([JSON.stringify(payload)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='Fokuskompisen_dagbok_krypterad.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);status('Säkerhetskopian är förberedd. Kontrollera att filen sparats.');}catch(e){status('Kunde inte skapa säkerhetskopia.');}};
+$('diaryImport15').onchange=async e=>{sync();const file=e.target.files[0];if(!file||locked)return;try{if(file.size>4000000)throw Error('Filen är för stor.');const data=JSON.parse(await file.text());if(data.app!=='Fokuskompisen-diary15'||!data.encrypted)throw Error('Fel filformat.');const pass=prompt('Ange säkerhetskopians lösenord:');if(pass===null)return;const incoming=await decrypt(data.encrypted,pass);if(!Array.isArray(incoming)||incoming.length>5000||valid(incoming).length!==incoming.length)throw Error('Ogiltigt innehåll.');if(!confirm('Lägg till '+incoming.length+' inlägg? Befintliga inlägg behålls.'))return;const ids=new Set(items.map(x=>x.id));items.push(...incoming.filter(x=>!ids.has(x.id)));if(await persist()){draw();status('Importen är klar. Inga befintliga inlägg har ersatts.');}}catch(err){status('Import misslyckades: '+err.message);}finally{e.target.value='';}};
+newEntry();const page=$('diary15Page');new MutationObserver(()=>{if(!page.hidden){sync();paintLock();draw();}}).observe(page,{attributes:true,attributeFilter:['hidden']});
+})();
+</script>
+</body></html>
